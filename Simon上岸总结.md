@@ -898,6 +898,308 @@ class Solution(object):
 - [124. 二叉树中的最大路径和](https://leetcode-cn.com/problems/binary-tree-maximum-path-sum/)
 - [297. 二叉树的序列化与反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree/)
 
+\104. Maximum Depth of Binary Tree
+
+Easy
+
+6837124Add to ListShare
+
+Given the `root` of a binary tree, return *its maximum depth*.
+
+A binary tree's **maximum depth** is the number of nodes along the longest path from the root node down to the farthest leaf node.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/11/26/tmp-tree.jpg)
+
+```
+Input: root = [3,9,20,null,null,15,7]
+Output: 3
+```
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def maxDepth(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        Classic tree depth problem, two solution algos,
+        either recursive call or iterative
+        """
+        
+        #recursive:
+        """
+        setting base case return 0 when it reaches to the leaf node,
+        at each leave it will ++ because it is the max of the level + 1
+        using less memory but possible stack overflow
+        """
+        if not root:
+            return 0
+        return max(self.maxDepth(root.left), self.maxDepth(root.right)) + 1
+    
+    
+        #iterative
+        """
+        using stack to iterate thru the tree
+        at after each level save the num of node of next level and when finish with next level do +1
+        compare to the recursive method use more memory because using deque
+        
+        """
+        if not root:
+            return 0
+        stack = deque([root])
+        num_of_level = 1
+        level = 0
+        
+        while(stack):
+            temp_node = stack.popleft()
+            if(temp_node.left):
+                stack.append(temp_node.left)
+            if(temp_node.right):
+                stack.append(temp_node.right)
+            num_of_level -= 1
+            if(num_of_level == 0):
+                num_of_level = len(stack)
+                level += 1
+            
+        return level
+        
+```
+
+\110. Balanced Binary Tree
+
+Easy
+
+5658311Add to ListShare
+
+Given a binary tree, determine if it is height-balanced.
+
+For this problem, a height-balanced binary tree is defined as:
+
+> a binary tree in which the left and right subtrees of *every* node differ in height by no more than 1.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/10/06/balance_1.jpg)
+
+```
+Input: root = [3,9,20,null,null,15,7]
+Output: true
+```
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def isBalanced(self, root):
+        """
+        :type root: TreeNode
+        :rtype: bool
+        """
+        # recursive method:
+        # if subtree is unbalanced, then the entire tree is unbalanced
+        # recursing till leaf node, check the depth of each subtree
+        
+        return self.checker(root) != -1
+    
+    def checker(self, root):
+        #base case
+        if not root:
+            return 0
+        
+        #recursive left and right
+        left = self.checker(root.left)
+        if (left == -1):
+            return -1
+        right = self.checker(root.right)
+        if(right == -1):
+            return -1
+        
+        #return -1 if unbalanced, return depth if balanced
+        if(abs(left - right) >= 2):
+            return -1
+        return max(left, right) + 1
+    
+```
+
+\543. Diameter of Binary Tree
+
+Easy
+
+7686487Add to ListShare
+
+Given the `root` of a binary tree, return *the length of the **diameter** of the tree*.
+
+The **diameter** of a binary tree is the **length** of the longest path between any two nodes in a tree. This path may or may not pass through the `root`.
+
+The **length** of a path between two nodes is represented by the number of edges between them.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/03/06/diamtree.jpg)
+
+```
+Input: root = [1,2,3,4,5]
+Output: 3
+Explanation: 3 is the length of the path [4,2,1,3] or [5,2,1,3].
+```
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    
+    # first create a globle max that can be used in each function 
+    max_depth = 0
+        
+        
+    def diameterOfBinaryTree(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        binary tree depth problem
+        using recursion 
+        max(left, right) + 1 is the max depth
+        """
+        self.depth(root)
+        return self.max_depth
+        
+    #helper function for recursive solution
+    def depth(self, root):
+        #base case:
+        if not root:
+            return 0
+        
+        #recursive call for each subtree
+        left_depth = self.depth(root.left)
+        right_depth = self.depth(root.right)
+        
+        #
+        self.max_depth = max(self.max_depth, left_depth + right_depth)
+        return max(left_depth, right_depth)+1
+        
+```
+
+\226. Invert Binary Tree
+
+Easy
+
+8160110Add to ListShare
+
+Given the `root` of a binary tree, invert the tree, and return *its root*.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/03/14/invert1-tree.jpg)
+
+```
+Input: root = [4,2,7,1,3,6,9]
+Output: [4,7,2,9,6,3,1]
+```
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def invertTree(self, root):
+        """
+        :type root: TreeNode
+        :rtype: TreeNode
+        classic binary tree invert/traverse
+        """
+        #base case
+        if not root:
+            return None
+        
+        #set temp to root.left because will change it later
+        temp = root.left
+        root.left = self.invertTree(root.right)
+        #recursively change each root.left and right
+        root.right = self.invertTree(temp)
+        
+        return root
+```
+
+\617. Merge Two Binary Trees
+
+Easy
+
+6455241Add to ListShare
+
+You are given two binary trees `root1` and `root2`.
+
+Imagine that when you put one of them to cover the other, some nodes of the two trees are overlapped while the others are not. You need to merge the two trees into a new binary tree. The merge rule is that if two nodes overlap, then sum node values up as the new value of the merged node. Otherwise, the NOT null node will be used as the node of the new tree.
+
+Return *the merged tree*.
+
+**Note:** The merging process must start from the root nodes of both trees.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/05/merge.jpg)
+
+```
+Input: root1 = [1,3,2,5], root2 = [2,1,3,null,4,null,7]
+Output: [3,4,5,5,4,null,7]
+```
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def mergeTrees(self, root1, root2):
+        """
+        :type root1: TreeNode
+        :type root2: TreeNode
+        :rtype: TreeNode
+        """
+        #recursion, no base case because will return None
+        if(root1 and root2):
+            root = TreeNode(root1.val + root2.val)
+            root.left = self.mergeTrees(root1.left, root2.left)
+            root.right = self.mergeTrees(root1.right, root2.right)
+        else:
+            #base case
+            return root1 or root2
+        
+        return root
+        
+```
+
+
+
 #### 二叉搜索树
 
 简单

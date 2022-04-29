@@ -1198,6 +1198,60 @@ class Solution(object):
         
 ```
 
+\112. Path Sum
+
+Easy
+
+5353779Add to ListShare
+
+Given the `root` of a binary tree and an integer `targetSum`, return `true` if the tree has a **root-to-leaf** path such that adding up all the values along the path equals `targetSum`.
+
+A **leaf** is a node with no children.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/01/18/pathsum1.jpg)
+
+```
+Input: root = [5,4,8,11,null,13,4,7,2,null,null,null,1], targetSum = 22
+Output: true
+Explanation: The root-to-leaf path with the target sum is shown.
+```
+
+```PYTHON
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def hasPathSum(self, root, targetSum):
+        """
+        :type root: TreeNode
+        :type targetSum: int
+        :rtype: bool
+        """
+        #classic recursion
+        #base case
+        if not root:
+            return False
+        #base case 2: when return true 
+        if not root.left and not root.right and root.val == targetSum:
+            return True
+        
+        #recursive steps
+        return self.hasPathSum(root.left, targetSum - root.val) or self.hasPathSum(root.right, targetSum - root.val)
+```
+
+
+
+
+
+
+
 
 
 #### 二叉搜索树

@@ -1246,7 +1246,68 @@ class Solution(object):
         return self.hasPathSum(root.left, targetSum - root.val) or self.hasPathSum(root.right, targetSum - root.val)
 ```
 
+\437. Path Sum III
 
+Medium
+
+7423359Add to ListShare
+
+Given the `root` of a binary tree and an integer `targetSum`, return *the number of paths where the sum of the values along the path equals* `targetSum`.
+
+The path does not need to start or end at the root or a leaf, but it must go downwards (i.e., traveling only from parent nodes to child nodes).
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/04/09/pathsum3-1-tree.jpg)
+
+```
+Input: root = [10,5,-3,3,2,null,11,3,-2,null,1], targetSum = 8
+Output: 3
+Explanation: The paths that sum to 8 are shown.
+```
+
+```py
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    
+    
+    def pathSum(self, root, targetSum):
+        """
+        :type root: TreeNode
+        :type targetSum: int
+        :rtype: int
+        """
+        #init
+        if not root:
+            return 0
+        
+        #using 
+        return self.helper(root, targetSum)+ self.pathSum(root.left, targetSum)+ self.pathSum(root.right, targetSum)
+        
+        
+        
+    #define helper ,ethod to treverse the binary tree by recursion
+    def helper(self, root, targetSum):
+        #base case
+        if not root:
+            return 0
+        res = 0
+        if root.val == targetSum:
+            res += 1
+        
+        #recursive steps
+        res += self.helper(root.left, targetSum - root.val)
+        res += self.helper(root.right, targetSum - root.val)
+        
+        return res
+        
+```
 
 
 
@@ -1268,6 +1329,67 @@ class Solution(object):
 - [173. 二叉搜索树迭代器](https://leetcode-cn.com/problems/binary-search-tree-iterator/)
 - [230. 二叉搜索树中第 K 小的元素](https://leetcode-cn.com/problems/kth-smallest-element-in-a-bst/)
 - [99. 恢复二叉搜索树](https://leetcode-cn.com/problems/recover-binary-search-tree/)
+
+\669. Trim a Binary Search Tree
+
+Medium
+
+4751237Add to ListShare
+
+Given the `root` of a binary search tree and the lowest and highest boundaries as `low` and `high`, trim the tree so that all its elements lies in `[low, high]`. Trimming the tree should **not** change the relative structure of the elements that will remain in the tree (i.e., any node's descendant should remain a descendant). It can be proven that there is a **unique answer**.
+
+Return *the root of the trimmed binary search tree*. Note that the root may change depending on the given bounds.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/09/09/trim1.jpg)
+
+```
+Input: root = [1,0,2], low = 1, high = 2
+Output: [1,null,2]
+```
+
+```py
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def trimBST(self, root, low, high):
+        """
+        :type root: TreeNode
+        :type low: int
+        :type high: int
+        :rtype: TreeNode
+        """
+        #Use recursion
+        #three situations to handle for each case
+        #1 root.val < low
+        #2 root.val > high
+        #3 root.val witin in low and high
+        
+        if not root:
+            return None
+        if root.val > high:
+            return self.trimBST(root.left, low, high)
+        if root.val < low:
+            return self.trimBST(root.right, low, high)
+        root.left = self.trimBST(root.left, low, high)
+        root.right = self.trimBST(root.right, low, high)
+        
+        return root
+    #there is a iterative way to solve but too complica
+```
+
+
+
+
+
+
 
 #### 字典树
 

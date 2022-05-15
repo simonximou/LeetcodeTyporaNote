@@ -1,5 +1,24 @@
 # Simon刷题笔记
 
+## Algos
+
+1. Searching
+   - Binary search
+   - DFS
+   - BFS
+2. Ordering
+   - Bubble sort
+   - Selection Sort
+   - Insertion Sort
+   - Quick Sort
+   - 
+3. Structure
+4. String
+5. Similarity
+6. Optimization
+
+
+
 ## Leetcode
 
 ### LinkedList
@@ -550,7 +569,7 @@ The last element output[4] is null, but its string representation as a ListNode 
 
 <img src="https://camo.githubusercontent.com/05f375896b965b6c1b2ead25c838b5b3385d18a112878d8e9d3dabacaf2cce8f/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303231303231393139303830393435312e706e67" alt="img" style="zoom:50%;" />
 
-#### LC number:
+
 
 #### 遍历
 
@@ -803,46 +822,6 @@ class Solution(object):
         
         helper(root, 0)
         return layer_to_left.values()
-```
-
-**\*236. Lowest Common Ancestor of a Binary Tree***
-
-Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
-
-According to the [definition of LCA on Wikipedia](https://en.wikipedia.org/wiki/Lowest_common_ancestor): “The lowest common ancestor is defined between two nodes `p` and `q` as the lowest node in `T` that has both `p` and `q` as descendants (where we allow **a node to be a descendant of itself**).”
-
-**Example 1:**
-
-![img](https://assets.leetcode.com/uploads/2018/12/14/binarytree.png)
-
-```
-Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
-Output: 3
-Explanation: The LCA of nodes 5 and 1 is 3.
-```
-
-```python
-class Solution(object): 
-    def lowestCommonAncestor(self, root, p, q):
-        """
-        DFS, recursion on the tree, if found both node, return root, else return the the found node since the other one must be down in the same brunch
-        """
-        # if itself is what we are looking for, return
-        if root == p or root == q:
-            return root
-        
-        # do left and right recursion
-        left = right = None
-        if root.left:
-            left = self.lowestCommonAncestor(root.left, p, q)
-        if root.right:
-            right = self.lowestCommonAncestor(root.right, p, q)
-            
-        # if noth children has target, return root, otherwise return the one that has target since the other one must down the same tree
-        if left and right:
-            return root
-        else:
-            return left or right 
 ```
 
 
@@ -1382,12 +1361,380 @@ class Solution(object):
         root.right = self.trimBST(root.right, low, high)
         
         return root
-    #there is a iterative way to solve but too complica
+    #there is a iterative way to solve but too complicated
 ```
 
+\230. Kth Smallest Element in a BST
 
+Medium
 
+7038128Add to ListShare
 
+Given the `root` of a binary search tree, and an integer `k`, return *the* `kth` *smallest value (**1-indexed**) of all the values of the nodes in the tree*.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/01/28/kthtree1.jpg)
+
+```
+Input: root = [3,1,4,null,2], k = 1
+Output: 1
+```
+
+```py
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def kthSmallest(self, root, k):
+        """
+        :type root: TreeNode
+        :type k: int
+        :rtype: int
+        """
+        #use recursion, inorder traversal
+        #BST in order traversal will result a sorted number list
+        #we can use an array to store all the value or use count and val to represent res
+        res = []
+        self.traversal(root, res)
+        return res[k-1]
+        
+    #tree traversal
+    def traversal(self, root, res):
+        if not root:
+            return 
+        self.traversal(root.left, res)
+        res.append(root.val)
+        self.traversal(root.right, res)
+        
+```
+
+\538. Convert BST to Greater Tree
+
+Medium
+
+4262159Add to ListShare
+
+Given the `root` of a Binary Search Tree (BST), convert it to a Greater Tree such that every key of the original BST is changed to the original key plus the sum of all keys greater than the original key in BST.
+
+As a reminder, a *binary search tree* is a tree that satisfies these constraints:
+
+- The left subtree of a node contains only nodes with keys **less than** the node's key.
+- The right subtree of a node contains only nodes with keys **greater than** the node's key.
+- Both the left and right subtrees must also be binary search trees.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2019/05/02/tree.png)
+
+```
+Input: root = [4,1,6,0,2,5,7,null,null,null,3,null,null,null,8]
+Output: [30,36,21,36,35,26,15,null,null,null,33,null,null,null,8]
+```
+
+```py
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def __init__(self):
+        self.count = 0
+    
+    def convertBST(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
+        self.helper(root)
+        return root
+        
+        
+    #helper recursion function that traverse BST from right to left
+    def helper(self, root):
+        if not root:
+            return
+        self.helper(root.right)
+        self.count += root.val
+        root.val = self.count
+        self.helper(root.left)
+```
+
+\235. Lowest Common Ancestor of a Binary Search Tree
+
+Easy
+
+5653183Add to ListShare
+
+Given a binary search tree (BST), find the lowest common ancestor (LCA) of two given nodes in the BST.
+
+According to the [definition of LCA on Wikipedia](https://en.wikipedia.org/wiki/Lowest_common_ancestor): “The lowest common ancestor is defined between two nodes `p` and `q` as the lowest node in `T` that has both `p` and `q` as descendants (where we allow **a node to be a descendant of itself**).”
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2018/12/14/binarysearchtree_improved.png)
+
+```
+Input: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 8
+Output: 6
+Explanation: The LCA of nodes 2 and 8 is 6.
+```
+
+```py
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def lowestCommonAncestor(self, root, p, q):
+        """
+        :type root: TreeNode
+        :type p: TreeNode
+        :type q: TreeNode
+        :rtype: TreeNode
+        """
+        #recursive solution:
+        #two cases, when rootval is greater or smaller than both cases:
+         #LCA must be on the over side of the tree
+        #when twoo nodes are on the opposite side,
+         #LCA is root
+        if p.val > root.val and q.val > root.val:    
+            return self.lowestCommonAncestor(root.right, p, q)
+        # If both p and q are lesser than parent
+        elif p.val < root.val and q.val < root.val:    
+            return self.lowestCommonAncestor(root.left, p, q)
+        # We have found the split point, i.e. the LCA node.
+        else:
+            return root
+        
+        
+        #Iterative solution:
+        #silimar to recursive 
+        # while root:
+        #     if root.val > p.val and root.val > q.val:
+        #         root = root.left
+        #     elif root.val < p.val and root.val < q.val:
+        #         root = root.right
+        #     else:
+        #         return root
+```
+
+**\*236. Lowest Common Ancestor of a Binary Tree***
+
+Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
+
+According to the [definition of LCA on Wikipedia](https://en.wikipedia.org/wiki/Lowest_common_ancestor): “The lowest common ancestor is defined between two nodes `p` and `q` as the lowest node in `T` that has both `p` and `q` as descendants (where we allow **a node to be a descendant of itself**).”
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2018/12/14/binarytree.png)
+
+```
+Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
+Output: 3
+Explanation: The LCA of nodes 5 and 1 is 3.
+```
+
+```python
+class Solution(object): 
+    def lowestCommonAncestor(self, root, p, q):
+        """
+        DFS, recursion on the tree, if found both node, return root, else return the the found node since the other one must be down in the same brunch
+        """
+        # if itself is what we are looking for, return
+        if root == p or root == q:
+            return root
+        
+        # do left and right recursion
+        left = right = None
+        if root.left:
+            left = self.lowestCommonAncestor(root.left, p, q)
+        if root.right:
+            right = self.lowestCommonAncestor(root.right, p, q)
+            
+        # if noth children has target, return root, otherwise return the one that has target since the other one must down the same tree
+        if left and right:
+            return root
+        else:
+            return left or right 
+```
+
+\108. Convert Sorted Array to Binary Search Tree
+
+Easy
+
+6338357Add to ListShare
+
+Given an integer array `nums` where the elements are sorted in **ascending order**, convert *it to a **height-balanced** binary search tree*.
+
+A **height-balanced** binary tree is a binary tree in which the depth of the two subtrees of every node never differs by more than one.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/18/btree1.jpg)
+
+```
+Input: nums = [-10,-3,0,5,9]
+Output: [0,-3,9,-10,null,5]
+Explanation: [0,-10,5,null,-3,null,9] is also accepted:
+```
+
+```py
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def sortedArrayToBST(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: TreeNode
+        """
+        #using recursion to build BST
+        
+        if len(nums) == 0:
+            return
+        node = TreeNode()
+        mid = len(nums)
+        node.val = nums[mid//2]
+        node.left = self.sortedArrayToBST(nums[:mid//2])
+        node.right = self.sortedArrayToBST(nums[mid//2+1:])
+        return node
+```
+
+\109. Convert Sorted List to Binary Search Tree
+
+Medium
+
+4560114Add to ListShare
+
+Given the `head` of a singly linked list where elements are **sorted in ascending order**, convert it to a height balanced BST.
+
+For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of *every* node never differ by more than 1.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/08/17/linked.jpg)
+
+```
+Input: head = [-10,-3,0,5,9]
+Output: [0,-3,9,-10,null,5]
+Explanation: One possible answer is [0,-3,9,-10,null,5], which represents the shown height balanced BST.
+```
+
+```py
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def sortedListToBST(self, head):
+        """
+        :type head: Optional[ListNode]
+        :rtype: Optional[TreeNode]
+        """
+        #base case: if head is the only node then it is a leaf node 
+        if not head:
+            return
+        if not head.next:
+            return TreeNode(head.val)
+        
+        #find mid of the list, so we can pass to the next level
+        #prev use one node before slow to cut off the left part 
+        fast, slow , prev = head, head, None
+        while fast and fast.next:
+            prev = slow
+            slow = slow.next
+            fast = fast.next.next
+            
+        #slow is root we find
+        node = TreeNode(slow.val)
+        #node.right 
+        right_head = slow.next
+        
+        #cut off node.left
+        if prev:
+            prev.next = None
+        
+        #recursive call to find node.left and right 
+        node.left = self.sortedListToBST(head)
+        node.right = self.sortedListToBST(right_head)
+        return node
+```
+
+\653. Two Sum IV - Input is a BST
+
+Easy
+
+3648203Add to ListShare
+
+Given the `root` of a Binary Search Tree and a target number `k`, return *`true` if there exist two elements in the BST such that their sum is equal to the given target*.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/09/21/sum_tree_1.jpg)
+
+```
+Input: root = [5,3,6,2,4,null,7], k = 9
+Output: true
+```
+
+```py
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def findTarget(self, root, k):
+        """
+        :type root: TreeNode
+        :type k: int
+        :rtype: bool
+        """
+        #1. hashset method 2. sorted array method
+        #1. use hash set to check in each step if the compliment is in the set 
+        #2. use preorder traversal to get sorted array and go from there
+        hashSet = set()
+        return self.dfs(root, hashSet, k)
+    
+    def dfs(self, root, hashSet, k):
+        #base case
+        if not root:
+            return False
+        if k - root.val in hashSet:
+            return True
+        
+        #add to set
+        hashSet.add(root.val)
+        return self.dfs(root.left, hashSet, k) or self.dfs(root.right, hashSet, k)
+```
 
 
 

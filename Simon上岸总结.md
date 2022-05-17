@@ -1772,7 +1772,79 @@ class Solution(object):
 - [699. 掉落的方块](https://leetcode-cn.com/problems/falling-squares/)
 - [327. 区间和的个数](https://leetcode-cn.com/problems/count-of-range-sum/)
 
-### DFS
+
+
+### Stack
+
+#### Basic
+
+\1190. Reverse Substrings Between Each Pair of Parentheses
+
+Medium
+
+130434Add to ListShare
+
+You are given a string `s` that consists of lower case English letters and brackets.
+
+Reverse the strings in each pair of matching parentheses, starting from the innermost one.
+
+Your result should **not** contain any brackets.
+
+ 
+
+**Example 1:**
+
+```
+Input: s = "(abcd)"
+Output: "dcba"
+```
+
+**Example 2:**
+
+```
+Input: s = "(u(love)i)"
+Output: "iloveu"
+Explanation: The substring "love" is reversed first, then the whole string is reversed.
+```
+
+```python
+class Solution(object):
+    def reverseParentheses(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        #O(n) time and space
+        # stack[0] will hold our result
+        # for each ( we will create a space before the letter to hold it,
+        # and whenever we see a ) we pop the letter and reverse it and put it back into
+        # the previous letter
+        
+        stack = [""]
+        for i in s:
+            if i == "(":
+                stack.append("")
+            elif i == ")":
+                add = stack.pop()[::-1]
+                stack[-1] += add
+            else:
+                stack[-1] += i
+        return stack.pop()
+```
+
+
+
+
+
+
+
+#### Monotone Stack
+
+
+
+### Searching
+
+#### DFS
 
 **695. Max Area of Island**
 

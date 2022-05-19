@@ -1736,6 +1736,57 @@ class Solution(object):
         return self.dfs(root.left, hashSet, k) or self.dfs(root.right, hashSet, k)
 ```
 
+530. Minimum Absolute Difference in BST
+
+Easy
+
+2041118Add to ListShare
+
+Given the `root` of a Binary Search Tree (BST), return *the minimum absolute difference between the values of any two different nodes in the tree*.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/05/bst1.jpg)
+
+```
+Input: root = [4,2,6,1,3]
+Output: 1
+```
+
+```py
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def getMinimumDifference(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        """
+        #in order recursive
+        res = []
+        def dfs(root, res):
+            if not root:
+                return
+            dfs(root.left, res)
+            res.append(root.val)
+            dfs(root.right, res)
+        
+        dfs(root, res)
+        diff = sys.maxint
+        
+        #打擂台
+        for i in range(1, len(res)):
+            diff = min(diff, res[i]-res[i-1])
+            
+        return diff
+```
+
 
 
 #### 字典树
@@ -1775,6 +1826,13 @@ class Solution(object):
 
 
 ### Stack
+
+#### Common Edge Case:
+
+- When dealing with String problem involving numbers, rememebr there could be multi digit numbers instead of 0-9, can use stack or add (x*10 + i) to get the number
+- 
+
+
 
 #### Basic
 
@@ -1832,9 +1890,39 @@ class Solution(object):
         return stack.pop()
 ```
 
+\394. Decode String
 
+Medium
 
+8161349Add to ListShare
 
+Given an encoded string, return its decoded string.
+
+The encoding rule is: `k[encoded_string]`, where the `encoded_string` inside the square brackets is being repeated exactly `k` times. Note that `k` is guaranteed to be a positive integer.
+
+You may assume that the input string is always valid; there are no extra white spaces, square brackets are well-formed, etc. Furthermore, you may assume that the original data does not contain any digits and that digits are only for those repeat numbers, `k`. For example, there will not be input like `3a` or `2[4]`.
+
+The test cases are generated so that the length of the output will never exceed `105`.
+
+ 
+
+**Example 1:**
+
+```
+Input: s = "3[a]2[bc]"
+Output: "aaabcbc"
+```
+
+**Example 2:**
+
+```
+Input: s = "3[a2[c]]"
+Output: "accaccacc"
+```
+
+```
+
+```
 
 
 

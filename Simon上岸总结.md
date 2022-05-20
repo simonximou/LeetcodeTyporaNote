@@ -1830,11 +1830,25 @@ class Solution(object):
 #### Common Edge Case:
 
 - When dealing with String problem involving numbers, rememebr there could be multi digit numbers instead of 0-9, can use stack or add (x*10 + i) to get the number
-- 
+- Remember to convert str to int if in a string
+- not string or len(s) == 0
+- isdigit() return false for '-11' because '-' is not digit.
+- try to ues //is in "+-*/" to test if it is a digit
 
 
 
 #### Basic
+
+[1130. Minimum Cost Tree From Leaf Values](https://leetcode.com/problems/minimum-cost-tree-from-leaf-values/discuss/339959/One-Pass-O(N)-Time-and-Space)
+[907. Sum of Subarray Minimums](https://leetcode.com/problems/sum-of-subarray-minimums/discuss/170750/C++JavaPython-Stack-Solution)
+[901. Online Stock Span](https://leetcode.com/problems/online-stock-span/discuss/168311/C++JavaPython-O(1))
+[856. Score of Parentheses](https://leetcode.com/problems/score-of-parentheses/discuss/141777/C++JavaPython-O(1)-Space)
+[503. Next Greater Element II](https://leetcode.com/problems/next-greater-element-ii/discuss/98270/JavaC++Python-Loop-Twice)
+\496. Next Greater Element I
+\84. Largest Rectangle in Histogram
+\42. Trapping Rain Water
+
+
 
 \1190. Reverse Substrings Between Each Pair of Parentheses
 
@@ -1920,13 +1934,159 @@ Input: s = "3[a2[c]]"
 Output: "accaccacc"
 ```
 
+```py
+class Solution(object):
+    def decodeString(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        #stack bracket problem
+        #create a stack like ['',3,abc] to store number and char, pop when needed 
+        res = [""]
+        curNum = 0
+        for i in s:
+            if i.isdigit():
+                curNum = curNum*10 + int(i)
+            elif i == "[":
+                res.append(curNum)
+                curNum = 0
+                res.append('')
+            elif i == "]":
+                add = res.pop() * res.pop()
+                res[-1] += add
+            else:
+                res[-1] += i
+        return res.pop()
 ```
 
+\227. Basic Calculator II
+
+Medium
+
+4303569Add to ListShare
+
+Given a string `s` which represents an expression, *evaluate this expression and return its value*. 
+
+The integer division should truncate toward zero.
+
+You may assume that the given expression is always valid. All intermediate results will be in the range of `[-231, 231 - 1]`.
+
+**Note:** You are not allowed to use any built-in function which evaluates strings as mathematical expressions, such as `eval()`.
+
+ 
+
+**Example 1:**
+
+```
+Input: s = "3+2*2"
+Output: 7
+```
+
+```py
+if not s:
+            return "0"
+        stack, num, sign = [], 0, "+"
+        for i in xrange(len(s)):
+            if s[i].isdigit():
+                num = num*10+ord(s[i])-ord("0")
+            if (not s[i].isdigit() and not s[i].isspace()) or i == len(s)-1:
+                if sign == "-":
+                    stack.append(-num)
+                elif sign == "+":
+                    stack.append(num)
+                elif sign == "*":
+                    stack.append(stack.pop()*num)
+                else:
+                    tmp = stack.pop()
+                    if tmp//num < 0 and tmp%num != 0:
+                        stack.append(tmp//num+1)
+                    else:
+                        stack.append(tmp//num)
+                sign = s[i]
+                num = 0
+        return sum(stack)
+```
+
+\150. Evaluate Reverse Polish Notation
+
+Medium
+
+3074632Add to ListShare
+
+Evaluate the value of an arithmetic expression in [Reverse Polish Notation](http://en.wikipedia.org/wiki/Reverse_Polish_notation).
+
+Valid operators are `+`, `-`, `*`, and `/`. Each operand may be an integer or another expression.
+
+**Note** that division between two integers should truncate toward zero.
+
+It is guaranteed that the given RPN expression is always valid. That means the expression would always evaluate to a result, and there will not be any division by zero operation.
+
+ 
+
+**Example 1:**
+
+```
+Input: tokens = ["2","1","+","3","*"]
+Output: 9
+Explanation: ((2 + 1) * 3) = 9
+```
+
+```python
+class Solution(object):
+    def evalRPN(self, tokens):
+        """
+        :type tokens: List[str]
+        :rtype: int
+        """
+        #stack bracket
+        # '/' case is tricky
+        res = []
+        for i in tokens:
+            if i not in "+-*/":
+                res.append(int(i))
+            elif i == '+':
+                res.append(res.pop() + res.pop())
+            elif i == '-':
+                sec, fir = res.pop(), res.pop()
+                res.append(fir - sec)
+            elif i == '*':
+                res.append(res.pop() * res.pop())
+            else:
+                a, b = res.pop(), res.pop()
+                add = b // a
+                if add < 0 and b%a != 0:
+                    res.append(add + 1)
+                else:
+                    res.append(add)
+        return res.pop()
 ```
 
 
 
 #### Monotone Stack
+
+\456. 132 Pattern
+
+Medium
+
+4640262Add to ListShare
+
+Given an array of `n` integers `nums`, a **132 pattern** is a subsequence of three integers `nums[i]`, `nums[j]` and `nums[k]` such that `i < j < k` and `nums[i] < nums[k] < nums[j]`.
+
+Return `true` *if there is a **132 pattern** in* `nums`*, otherwise, return* `false`*.*
+
+**Example 1:**
+
+```
+Input: nums = [1,2,3,4]
+Output: false
+Explanation: There is no 132 pattern in the sequence.
+```
+
+```
+
+```
 
 
 

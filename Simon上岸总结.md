@@ -1834,6 +1834,7 @@ class Solution(object):
 - not string or len(s) == 0
 - isdigit() return false for '-11' because '-' is not digit.
 - try to ues //is in "+-*/" to test if it is a digit
+- '1111111' or 'sssssssss'
 
 
 
@@ -2062,9 +2063,369 @@ class Solution(object):
         return res.pop()
 ```
 
+\856. Score of Parentheses
+
+Medium
+
+4405143Add to ListShare
+
+Given a balanced parentheses string `s`, return *the **score** of the string*.
+
+The **score** of a balanced parentheses string is based on the following rule:
+
+- `"()"` has score `1`.
+- `AB` has score `A + B`, where `A` and `B` are balanced parentheses strings.
+- `(A)` has score `2 * A`, where `A` is a balanced parentheses string.
+
+**Example 1:**
+
+```
+Input: s = "()"
+Output: 1
+```
+
+```py
+class Solution(object):
+    def scoreOfParentheses(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        #Using stacks O(n) O(n)
+        
+#         #Create a stack and sum
+#         stack = []
+#         curSum = 0
+        
+#         for i in s:
+#             #if i == ( we add sum of last layer into the stack and set sum of this layer = 0
+#             if i == '(':
+#                 stack.append(curSum)
+#                 curSum = 0
+#             #if i == ) sum = sum of last layer + 2* this layer 
+#             else:
+#                 curSum = stack.pop() + max(curSum * 2, 1)
+#         return curSum
+    
+        #Follow up O(1) space: with no stack
+        #Using levels
+        
+        res, level= 0, 0
+        for i in range(0, len(s)-1):
+            j = i+1
+            if s[i] + s[j] == '()':
+                res += 2 ** level
+            if s[i] == '(':
+                level += 1
+            else:
+                level -= 1
+        return res
+```
+
+\1249. Minimum Remove to Make Valid Parentheses
+
+Medium
+
+480482Add to ListShare
+
+Given a string s of `'('` , `')'` and lowercase English characters.
+
+Your task is to remove the minimum number of parentheses ( `'('` or `')'`, in any positions ) so that the resulting *parentheses string* is valid and return **any** valid string.
+
+Formally, a *parentheses string* is valid if and only if:
+
+- It is the empty string, contains only lowercase characters, or
+- It can be written as `AB` (`A` concatenated with `B`), where `A` and `B` are valid strings, or
+- It can be written as `(A)`, where `A` is a valid string.
+
+ 
+
+**Example 1:**
+
+```
+Input: s = "lee(t(c)o)de)"
+Output: "lee(t(c)o)de"
+Explanation: "lee(t(co)de)" , "lee(t(c)ode)" would also be accepted.
+```
+
+```py
+class Solution(object):
+    def minRemoveToMakeValid(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        #stack bucket problem
+        s = list(s)
+        pointer, checker = 0, []
+        for i in range(len(s)):
+            #1 s[i] == ( so we save its index if its the first ( then append it to stack
+            if s[i] == '(':
+                checker.append(i)
+            
+            #2 s[i] == ) if stack empty then it is the extra one
+            elif s[i] == ')':
+                if not checker:
+                    s[i] = ''
+                    continue
+                checker.pop()
+        
+        while checker:
+            s[checker.pop()] = ''
+        return ''.join(s)
+
+```
+
+\224. Basic Calculator
+
+Hard
+
+3619296Add to ListShare
+
+Given a string `s` representing a valid expression, implement a basic calculator to evaluate it, and return *the result of the evaluation*.
+
+**Note:** You are **not** allowed to use any built-in function which evaluates strings as mathematical expressions, such as `eval()`.
+
+ 
+
+**Example 1:**
+
+```
+Input: s = "1 + 1"
+Output: 2
+```
+
+```py
+class Solution(object):
+    def calculate(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        #stack to hold bucket operation and sign 
+        stack, sign, num, res = [], 1, 0, 0
+        #loop thru the Stirng
+            #if i is digit, append into num 
+            #elif i is + or -, add i*sign into res, sign sign as 1 or -1
+            #elif i is (, append res and sign into the stack
+            #elif i is ), pop sign and res back
+    
+        for i in s:
+            if i.isdigit():
+                num = num * 10 + int(i)
+            elif i == '+':
+                res += num * sign
+                num = 0
+                sign = 1
+            elif i == '-':
+                res += num * sign
+                num = 0
+                sign = -1
+            elif i == '(':
+                stack.append(res)
+                stack.append(sign)
+                res = 0
+                sign = 1
+            elif i == ')':
+                res += num * sign
+                res *= stack.pop()
+                res += stack.pop()
+                num = 0
+        if num != 0:
+            res += num * sign
+        return res
+    
+```
+
 
 
 #### Monotone Stack
+
+\496. Next Greater Element I
+
+Easy
+
+2912190Add to ListShare
+
+The **next greater element** of some element `x` in an array is the **first greater** element that is **to the right** of `x` in the same array.
+
+You are given two **distinct 0-indexed** integer arrays `nums1` and `nums2`, where `nums1` is a subset of `nums2`.
+
+For each `0 <= i < nums1.length`, find the index `j` such that `nums1[i] == nums2[j]` and determine the **next greater element** of `nums2[j]` in `nums2`. If there is no next greater element, then the answer for this query is `-1`.
+
+Return *an array* `ans` *of length* `nums1.length` *such that* `ans[i]` *is the **next greater element** as described above.*
+
+ 
+
+**Example 1:**
+
+```
+Input: nums1 = [4,1,2], nums2 = [1,3,4,2]
+Output: [-1,3,-1]
+Explanation: The next greater element for each value of nums1 is as follows:
+- 4 is underlined in nums2 = [1,3,4,2]. There is no next greater element, so the answer is -1.
+- 1 is underlined in nums2 = [1,3,4,2]. The next greater element is 3.
+- 2 is underlined in nums2 = [1,3,4,2]. There is no next greater element, so the answer is -1.
+```
+
+```py
+class Solution(object):
+    def nextGreaterElement(self, nums1, nums2):
+        """
+        :type nums1: List[int]
+        :type nums2: List[int]
+        :rtype: List[int]
+        """
+        #monotone stack problem, create a stack that only increases or decreases
+        #if find a bigger number, pop stack while that number > stack.peek()
+        
+        #use dict to hold NGE 
+        dic = collections.defaultdict(int)
+        stack = []
+        
+        for i in nums2:
+            while stack and i > stack[-1]:
+                dic[stack.pop()] = i
+            stack.append(i)
+
+        for j in range(len(nums1)):
+            nums1[j] = dic.get(nums1[j]) or -1
+            
+        return nums1
+```
+
+\739. Daily Temperatures
+
+Medium
+
+7029158Add to ListShare
+
+Given an array of integers `temperatures` represents the daily temperatures, return *an array* `answer` *such that* `answer[i]` *is the number of days you have to wait after the* `ith` *day to get a warmer temperature*. If there is no future day for which this is possible, keep `answer[i] == 0` instead.
+
+ 
+
+**Example 1:**
+
+```
+Input: temperatures = [73,74,75,71,69,72,76,73]
+Output: [1,1,4,2,1,1,0,0]
+```
+
+```py
+class Solution(object):
+    def dailyTemperatures(self, temperatures):
+        """
+        :type temperatures: List[int]
+        :rtype: List[int]
+        """
+        #use a stack and counter
+        stack, counter = [], 1
+        
+        #loop thru the array and append index to stack. when see a bigger element, compare the index to find the num of days
+        for i in range(len(temperatures)):
+            while stack and temperatures[stack[-1]] < temperatures[i]:
+                temp = stack.pop()
+                temperatures[temp] = i - temp
+            stack.append(i)
+        for j in stack:
+            temperatures[j] = 0
+        return temperatures
+        
+```
+
+\402. Remove K Digits
+
+Medium
+
+6080253Add to ListShare
+
+Given string num representing a non-negative integer `num`, and an integer `k`, return *the smallest possible integer after removing* `k` *digits from* `num`.
+
+ 
+
+**Example 1:**
+
+```
+Input: num = "1432219", k = 3
+Output: "1219"
+Explanation: Remove the three digits 4, 3, and 2 to form the new number 1219 which is the smallest.
+```
+
+```py
+class Solution(object):
+    def removeKdigits(self, num, k):
+        """
+        :type num: str
+        :type k: int
+        :rtype: str
+        """
+        stack = []
+        #using stack to hold needed number and when find a smaller number pop the stack[-1]
+        for i in num:
+            while stack and k > 0 and stack[-1] > i:
+                stack.pop()
+                k -= 1
+            stack.append(i)
+        
+        #while not done gitting rid of numbers, keep poping because only bigger numbers at the end
+        while k > 0:
+            stack.pop()
+            k -= 1
+            
+        #while there are 0s at the beginning, pop it
+        #you can also not append it to stack when there's nothing in stack
+        j = 0
+        while j < len(stack)-1 and stack[j] == "0":
+            stack[j] = ''
+            j += 1
+        if not stack:
+            return '0'
+        return ''.join(stack)
+```
+
+\316. Remove Duplicate Letters
+
+Medium
+
+5307346Add to ListShare
+
+Given a string `s`, remove duplicate letters so that every letter appears once and only once. You must make sure your result is **the smallest in lexicographical order** among all possible results.
+
+ 
+
+**Example 1:**
+
+```
+Input: s = "bcabc"
+Output: "abc"
+```
+
+```PY
+class Solution(object):
+    def removeDuplicateLetters(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        #monotone stack
+        #use dict to keep track of appearace of each element
+        stack = []
+        dic = collections.defaultdict(int)
+        for i in s:
+            dic[i] += 1
+
+        #keep appending i into stack, if find element smaller than stack[-1] and there are more stack[-1] left, pop
+        for i in s:
+            if i not in stack:
+                while stack and dic.get(stack[-1]) > 0 and i <= stack[-1]:
+                    stack.pop()
+                stack.append(i)
+            dic[i] -= 1
+        
+        #get rid of the dups in the end
+        stack = stack[0:len(dic)]
+        return ''.join(stack)
+```
 
 \456. 132 Pattern
 
@@ -2087,6 +2448,10 @@ Explanation: There is no 132 pattern in the sequence.
 ```
 
 ```
+
+
+
+### Heap
 
 
 

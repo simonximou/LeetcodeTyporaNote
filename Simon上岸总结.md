@@ -2453,6 +2453,138 @@ Explanation: There is no 132 pattern in the sequence.
 
 ### Heap
 
+```py
+heapq.heapify() #build
+heapq.heappop() #pop 
+heapq.heappush(,) #push
+```
+
+\1046. Last Stone Weight
+
+Easy
+
+317964Add to ListShare
+
+You are given an array of integers `stones` where `stones[i]` is the weight of the `ith` stone.
+
+We are playing a game with the stones. On each turn, we choose the **heaviest two stones** and smash them together. Suppose the heaviest two stones have weights `x` and `y` with `x <= y`. The result of this smash is:
+
+- If `x == y`, both stones are destroyed, and
+- If `x != y`, the stone of weight `x` is destroyed, and the stone of weight `y` has new weight `y - x`.
+
+At the end of the game, there is **at most one** stone left.
+
+Return *the smallest possible weight of the left stone*. If there are no stones left, return `0`.
+
+ 
+
+**Example 1:**
+
+```
+Input: stones = [2,7,4,1,8,1]
+Output: 1
+Explanation: 
+We combine 7 and 8 to get 1 so the array converts to [2,4,1,1,1] then,
+we combine 2 and 4 to get 2 so the array converts to [2,1,1,1] then,
+we combine 2 and 1 to get 1 so the array converts to [1,1,1] then,
+we combine 1 and 1 to get 0 so the array converts to [1] then that's the value of the last stone.
+```
+
+```py
+class Solution(object):
+    def lastStoneWeight(self, stones):
+        """
+        :type stones: List[int]
+        :rtype: int
+        """
+        #brute force use sort and after every smash resort O(N^2 logn)
+        #solution #1 use heap to build heap and pop + every insertion only take O(log n) so total O(N log n)
+        #solution #2 use binary search, first sort then use binary search to insert
+        
+        #heap solution
+        #we want the heaveiestg stone so make stones value negative so we will pop largest
+        h = [-x for x in stones]
+        heapq.heapify(h)
+        
+        while len(h) > 1:
+            heapq.heappush(h, heappop(h) - heappop(h))
+        
+        return -h[-1]
+```
+
+\703. Kth Largest Element in a Stream
+
+Easy
+
+29231739Add to ListShare
+
+Design a class to find the `kth` largest element in a stream. Note that it is the `kth` largest element in the sorted order, not the `kth` distinct element.
+
+Implement `KthLargest` class:
+
+- `KthLargest(int k, int[] nums)` Initializes the object with the integer `k` and the stream of integers `nums`.
+- `int add(int val)` Appends the integer `val` to the stream and returns the element representing the `kth` largest element in the stream.
+
+ 
+
+**Example 1:**
+
+```
+Input
+["KthLargest", "add", "add", "add", "add", "add"]
+[[3, [4, 5, 8, 2]], [3], [5], [10], [9], [4]]
+Output
+[null, 4, 5, 5, 8, 8]
+
+Explanation
+KthLargest kthLargest = new KthLargest(3, [4, 5, 8, 2]);
+kthLargest.add(3);   // return 4
+kthLargest.add(5);   // return 5
+kthLargest.add(10);  // return 5
+kthLargest.add(9);   // return 8
+kthLargest.add(4);   // return 8
+```
+
+```py
+class KthLargest(object):
+
+    def __init__(self, k, nums):
+        """
+        :type k: int
+        :type nums: List[int]
+        """
+        self.k = k
+        self.nums = nums
+        heapq.heapify(self.nums)
+        while len(self.nums) > k:
+            heapq.heappop(self.nums)
+        
+
+    def add(self, val):
+        """
+        :type val: int
+        :rtype: int
+        """
+        if len(self.nums) < self.k:
+            heapq.heappush(self.nums, val)
+        elif val > self.nums[0]:
+            heapq.heapreplace(self.nums, val)
+        return self.nums[0]
+
+
+# Your KthLargest object will be instantiated and called as such:
+# obj = KthLargest(k, nums)
+# param_1 = obj.add(val)
+```
+
+
+
+
+
+
+
+
+
 
 
 ### Searching

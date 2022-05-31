@@ -2457,6 +2457,11 @@ Explanation: There is no 132 pattern in the sequence.
 heapq.heapify() #build
 heapq.heappop() #pop 
 heapq.heappush(,) #push
+heapq.heapreplace(,) #pop then push
+heapq.heappoppush(,) #push then pop
+heapq.nlargest(n, ) #get n th largest element
+heapq.nsmallest(n, ) #get n th smallest elemnt 
+in python, the difference between max and min heap is just the way you push elements into the heap heapq.heappush(heap, i) vs heapq.heappush(heap, -i)
 ```
 
 \1046. Last Stone Weight
@@ -2577,9 +2582,56 @@ class KthLargest(object):
 # param_1 = obj.add(val)
 ```
 
+\347. Top K Frequent Elements
 
+Medium
 
+9245372Add to ListShare
 
+Given an integer array `nums` and an integer `k`, return *the* `k` *most frequent elements*. You may return the answer in **any order**.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [1,1,1,2,2,3], k = 2
+Output: [1,2]
+```
+
+```py
+class Solution(object):
+    def topKFrequent(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: List[int]
+        """
+        #Heap problem
+        #use int dict to find frequency, -1 for finding item, then push into heap, pop in res
+        
+        dic = collections.defaultdict(int)
+        
+        for i in nums:
+            if i in dic:
+                dic[i] -= 1
+            else:
+                dic[i] = -1
+        
+        #now we have a dict holding item and freq
+        heap = []
+        for key in dic:
+            heapq.heappush(heap, (dic[key], key))
+            
+        #now ew have a heap with sorted freq, since -1, appeared more will be at the front
+        res = []
+        counter = 0
+        while counter < k:
+            res.append(heapq.heappop(heap)[-1])
+            counter +=1 
+        return res
+    
+```
 
 
 

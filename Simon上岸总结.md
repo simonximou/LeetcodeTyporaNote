@@ -2453,7 +2453,15 @@ Explanation: There is no 132 pattern in the sequence.
 
 ### Heap
 
+#### Index
+
 ```py
+#Difference between heappush and heapify:
+    1. The heappush method will have time complexity O(n * log(n)) where n is ending size of the heap, while the heapify method will have complexity O(n), which is significantly lower. 
+    2. heappush assumes that the array (H in your case) is already a heap. heapify does not
+    3. doing heapifyon a list is almost always a better choice than creating an empty list and adding many items with heappush. If you just add a few items, heappush may be better.
+
+#common functions 
 heapq.heapify() #build
 heapq.heappop() #pop 
 heapq.heappush(,) #push
@@ -2461,7 +2469,12 @@ heapq.heapreplace(,) #pop then push
 heapq.heappoppush(,) #push then pop
 heapq.nlargest(n, ) #get n th largest element
 heapq.nsmallest(n, ) #get n th smallest elemnt 
+
+#max and min heap
 in python, the difference between max and min heap is just the way you push elements into the heap heapq.heappush(heap, i) vs heapq.heappush(heap, -i)
+# Build heap
+	heap = [(-v, k) for k, v in cnt.items()]
+	heapq.heapify(heap)
 ```
 
 \1046. Last Stone Weight
@@ -2633,13 +2646,249 @@ class Solution(object):
     
 ```
 
+\451. Sort Characters By Frequency
 
+Medium
 
+4156181Add to ListShare
 
+Given a string `s`, sort it in **decreasing order** based on the **frequency** of the characters. The **frequency** of a character is the number of times it appears in the string.
+
+Return *the sorted string*. If there are multiple answers, return *any of them*.
+
+ 
+
+**Example 1:**
+
+```
+Input: s = "tree"
+Output: "eert"
+Explanation: 'e' appears twice while 'r' and 't' both appear once.
+So 'e' must appear before both 'r' and 't'. Therefore "eetr" is also a valid answer.
+```
+
+```py
+class Solution(object):
+    def frequencySort(self, s):
+        """
+        :type s: str
+        :rtype: str
+        """
+        #use a dict to hold the freq and item
+        dict = collections.Counter(s)
+        heap = []
+        
+        #put item and freq into maxheap, so sorted 
+        for v, t in dict.items():
+            heap.append((-t, v))
+        heapq.heapify(heap)
+        print heap
+        #now we have a sorted heap with elements 
+        #just put everything into res
+        res = []
+        while heap:
+            i, j = heapq.heappop(heap)
+            res.append(j * -i)
+            
+        return ''.join(res)
+        # since we first use dict, cost O(n), then we heapify which also cost O(n)
+        # heappop cost O(nlogk)  where k is the number of distinct character
+
+```
+
+\692. Top K Frequent Words
+
+Medium
+
+4500252Add to ListShare
+
+Given an array of strings `words` and an integer `k`, return *the* `k` *most frequent strings*.
+
+Return the answer **sorted** by **the frequency** from highest to lowest. Sort the words with the same frequency by their **lexicographical order**.
+
+ 
+
+**Example 1:**
+
+```
+Input: words = ["i","love","leetcode","i","love","coding"], k = 2
+Output: ["i","love"]
+Explanation: "i" and "love" are the two most frequent words.
+Note that "i" comes before "love" due to a lower alphabetical order.
+```
+
+```py
+class Solution(object):
+    def topKFrequent(self, words, k):
+        """
+        :type words: List[str]
+        :type k: int
+        :rtype: List[str]
+        """
+        #Heap problem
+        #use int dict to find frequency, -1 for finding item, then push into heap, pop in res
+        
+        dic = collections.defaultdict(int)
+        
+        for i in words:
+            if i in dic:
+                dic[i] += 1
+            else:
+                dic[i] = 1
+        
+        #now we have a dict holding item and freq
+        heap = []
+        for key in dic:
+            heapq.heappush(heap, (dic[key], key))
+            if len(heap) > k:
+                heapq.heappop(heap)
+            
+        #now ew have a heap with sorted freq, since -1, appeared more will be at the front
+        # res = []
+        # counter = 0
+        # while counter < k:
+        #     res.append(heapq.heappop(heap)[-1])
+        #     counter +=1 
+        # return res
+        res = [i[-1] for i in heap]
+        return res
+```
+
+\378. Kth Smallest Element in a Sorted Matrix
+
+Medium
+
+5906240Add to ListShare
+
+Given an `n x n` `matrix` where each of the rows and columns is sorted in ascending order, return *the* `kth` *smallest element in the matrix*.
+
+Note that it is the `kth` smallest element **in the sorted order**, not the `kth` **distinct** element.
+
+You must find a solution with a memory complexity better than `O(n2)`.
+
+ 
+
+**Example 1:**
+
+```
+Input: matrix = [[1,5,9],[10,11,13],[12,13,15]], k = 8
+Output: 13
+Explanation: The elements in the matrix are [1,5,9,10,11,12,13,13,15], and the 8th smallest number is 13
+```
+
+```py
+class Solution(object):
+    def kthSmallest(self, matrix, k):
+        """
+        :type matrix: List[List[int]]
+        :type k: int
+        :rtype: int
+        """
+        heap = []
+        for i in range(len(matrix)):
+            for j in range(len(matrix[0])):
+                heapq.heappush(heap, matrix[i][j])
+        
+        count = 1
+        while count < k:
+            heapq.heappop(heap)
+            count += 1
+        return heapq.heappop(heap)
+```
+
+#### Cheapest flight problem*
+
+\743. Network Delay Time
+
+Medium
+
+4897305Add to ListShare
+
+You are given a network of `n` nodes, labeled from `1` to `n`. You are also given `times`, a list of travel times as directed edges `times[i] = (ui, vi, wi)`, where `ui` is the source node, `vi` is the target node, and `wi` is the time it takes for a signal to travel from source to target.
+
+We will send a signal from a given node `k`. Return *the **minimum** time it takes for all the* `n` *nodes to receive the signal*. If it is impossible for all the `n` nodes to receive the signal, return `-1`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2019/05/23/931_example_1.png)
+
+```
+Input: times = [[2,1,1],[2,3,1],[3,4,1]], n = 4, k = 2
+Output: 2
+```
+
+```
+
+```
+
+\787. Cheapest Flights Within K Stops
+
+Medium
+
+4992228Add to ListShare
+
+There are `n` cities connected by some number of flights. You are given an array `flights` where `flights[i] = [fromi, toi, pricei]` indicates that there is a flight from city `fromi` to city `toi` with cost `pricei`.
+
+You are also given three integers `src`, `dst`, and `k`, return ***the cheapest price** from* `src` *to* `dst` *with at most* `k` *stops.* If there is no such route, return `-1`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2022/03/18/cheapest-flights-within-k-stops-3drawio.png)
+
+```
+Input: n = 4, flights = [[0,1,100],[1,2,100],[2,0,100],[1,3,600],[2,3,200]], src = 0, dst = 3, k = 1
+Output: 700
+Explanation:
+The graph is shown above.
+The optimal path with at most 1 stop from city 0 to 3 is marked in red and has cost 100 + 600 = 700.
+Note that the path through cities [0,1,2,3] is cheaper but is invalid because it uses 2 stops.
+```
+
+```
+
+```
+
+\973. K Closest Points to Origin
+
+Medium
+
+5615207Add to ListShare
+
+Given an array of `points` where `points[i] = [xi, yi]` represents a point on the **X-Y** plane and an integer `k`, return the `k` closest points to the origin `(0, 0)`.
+
+The distance between two points on the **X-Y** plane is the Euclidean distance (i.e., `√(x1 - x2)2 + (y1 - y2)2`).
+
+You may return the answer in **any order**. The answer is **guaranteed** to be **unique** (except for the order that it is in).
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/03/03/closestplane1.jpg)
+
+```
+Input: points = [[1,3],[-2,2]], k = 1
+Output: [[-2,2]]
+Explanation:
+The distance between (1, 3) and the origin is sqrt(10).
+The distance between (-2, 2) and the origin is sqrt(8).
+Since sqrt(8) < sqrt(10), (-2, 2) is closer to the origin.
+We only want the closest k = 1 points from the origin, so the answer is just [[-2,2]].
+```
+
+```
+
+```
 
 
 
 ### Searching
+
+#### Binary Search
 
 #### DFS
 

@@ -2237,7 +2237,103 @@ class Solution(object):
     
 ```
 
+\503. Next Greater Element II
 
+Medium
+
+4568134Add to ListShare
+
+Given a circular integer array `nums` (i.e., the next element of `nums[nums.length - 1]` is `nums[0]`), return *the **next greater number** for every element in* `nums`.
+
+The **next greater number** of a number `x` is the first greater number to its traversing-order next in the array, which means you could search circularly to find its next greater number. If it doesn't exist, return `-1` for this number.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [1,2,1]
+Output: [2,-1,2]
+Explanation: The first 1's next greater number is 2; 
+The number 2 can't find next greater number. 
+The second 1's next greater number needs to search circularly, which is also 2.
+```
+
+```python
+class Solution(object):
+    def nextGreaterElements(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        #circular arary problem, brute force double for loop
+        #stack solution uses stack to hold index from back to front
+        
+        n, stack = len(nums), []
+        res = [0]*n
+        for j in range(n-1, -1, -1):
+            stack.append(j) 
+        
+        #loop from the last element and compare with each of the element in the front
+        #add current number into stack because in next loop if last num smaller than curnum 
+        #that will be the answser and if last num larger than curnum will continue to where it were in the last loop. 
+        for i in range(n-1, -1, -1):
+            #set defult res as -1
+            res[i] = -1
+            while(stack and nums[stack[-1]] <= nums[i]):
+                stack.pop()
+            if stack:
+                res[i] = nums[stack[-1]]
+            stack.append(i)
+        return res
+```
+
+\71. Simplify Path
+
+Medium
+
+2427486Add to ListShare
+
+Given a string `path`, which is an **absolute path** (starting with a slash `'/'`) to a file or directory in a Unix-style file system, convert it to the simplified **canonical path**.
+
+In a Unix-style file system, a period `'.'` refers to the current directory, a double period `'..'` refers to the directory up a level, and any multiple consecutive slashes (i.e. `'//'`) are treated as a single slash `'/'`. For this problem, any other format of periods such as `'...'` are treated as file/directory names.
+
+The **canonical path** should have the following format:
+
+- The path starts with a single slash `'/'`.
+- Any two directories are separated by a single slash `'/'`.
+- The path does not end with a trailing `'/'`.
+- The path only contains the directories on the path from the root directory to the target file or directory (i.e., no period `'.'` or double period `'..'`)
+
+Return *the simplified **canonical path***.
+
+ 
+
+**Example 1:**
+
+```
+Input: path = "/home/"
+Output: "/home"
+Explanation: Note that there is no trailing slash after the last directory name.
+```
+
+```python
+class Solution(object):
+    def simplifyPath(self, path):
+        """
+        :type path: str
+        :rtype: str
+        """
+        stack = []
+        for token in path.split('/'):
+            if token == "..":
+                if stack:
+                    stack.pop()
+            elif token != "." and token != '':
+                stack.append(token)
+        return '/' + '/'.join(stack)
+            
+```
 
 #### Monotone Stack
 

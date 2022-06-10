@@ -1823,6 +1823,30 @@ class Solution(object):
 - [699. 掉落的方块](https://leetcode-cn.com/problems/falling-squares/)
 - [327. 区间和的个数](https://leetcode-cn.com/problems/count-of-range-sum/)
 
+#### Red Black Tree
+
+#### **Rules That Every Red-Black Tree Follows:** 
+
+1. Every node has a color either red or black.
+
+2. The root of the tree is always black.
+
+3. There are no two adjacent red nodes (A red node cannot have a red parent or red child).
+
+4. Every path from a node (including root) to any of its descendants NULL nodes has the same number of black nodes.
+
+5. All leaf nodes are black nodes.
+
+   | Sr. No. | Algorithm | Time Complexity |
+   | :------ | :-------- | :-------------- |
+   | 1.      | Search    | O(log n)        |
+   | 2.      | Insert    | O(log n)        |
+   | 3.      | Delete    | O(log n)        |
+
+```
+
+```
+
 
 
 ### Stack

@@ -2552,6 +2552,8 @@ Explanation: There is no 132 pattern in the sequence.
 #### Index
 
 ```py
+#you want O(1) max() and min()
+
 #Difference between heappush and heapify:
     1. The heappush method will have time complexity O(n * log(n)) where n is ending size of the heap, while the heapify method will have complexity O(n), which is significantly lower. 
     2. heappush assumes that the array (H in your case) is already a heap. heapify does not
@@ -2985,6 +2987,129 @@ We only want the closest k = 1 points from the origin, so the answer is just [[-
 ### Searching
 
 #### Binary Search
+
+##### Template
+
+```c++
+
+        int n = nums.size();
+        int left = 0;
+        int right = n; // 我们定义target在左闭右开的区间里，[left, right)  
+        while (left < right) { // 因为left == right的时候，在[left, right)是无效的空间
+            int middle = left + ((right - left) >> 1);
+            if (nums[middle] > target) {
+                right = middle; // target 在左区间，因为是左闭右开的区间，nums[middle]一定不是我们的目标值，所以right = middle，在[left, middle)中继续寻找目标值
+            } else if (nums[middle] < target) {
+                left = middle + 1; // target 在右区间，在 [middle+1, right)中
+            } else { // nums[middle] == target
+                return middle; // 数组中找到目标值的情况，直接返回下标
+            }
+        }
+        return right;
+```
+
+```python
+		left, right = 1, n
+        while left < right:
+            mid = left + (right - left) // 2
+            if isBadVersion(mid):
+                right = mid
+            else:
+                left = mid + 1
+        return left
+```
+
+##### Basic
+
+\300. Longest Increasing Subsequence
+
+Medium
+
+12292237Add to ListShare
+
+Given an integer array `nums`, return the length of the longest strictly increasing subsequence.
+
+A **subsequence** is a sequence that can be derived from an array by deleting some or no elements without changing the order of the remaining elements. For example, `[3,6,2,7]` is a subsequence of the array `[0,3,1,6,2,2,7]`.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [10,9,2,5,3,7,101,18]
+Output: 4
+Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
+```
+
+```py
+class Solution(object):
+    def lengthOfLIS(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        res = []
+        for i in nums:
+            if not res or i > res[-1]:
+                res.append(i)
+            else:
+                idx = bisect_left(res, i)  # Find the index of the smallest number >= x
+                res[idx] = i
+        return len(res)
+```
+
+\74. Search a 2D Matrix
+
+Medium
+
+7879281Add to ListShare
+
+Write an efficient algorithm that searches for a value `target` in an `m x n` integer matrix `matrix`. This matrix has the following properties:
+
+- Integers in each row are sorted from left to right.
+- The first integer of each row is greater than the last integer of the previous row.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/10/05/mat.jpg)
+
+```
+Input: matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 3
+Output: true
+```
+
+```py
+class Solution(object):
+    def searchMatrix(self, matrix, target):
+        """
+        :type matrix: List[List[int]]
+        :type target: int
+        :rtype: bool
+        """
+        for subMatrix in matrix:
+            if target <= subMatrix[-1]:
+                #do binary search
+                left, right, mid = 0, len(subMatrix)-1, 0
+                while left < right:
+                    mid = (left + right)//2 #python, other use left + (right -left)//2
+                    if target < subMatrix[mid]:
+                        right = mid
+                    elif target > subMatrix[mid]:
+                        left = mid+1
+                    else:
+                        return True
+                if subMatrix[left] == target or subMatrix[right] == target:
+                    return True 
+                else:
+                    return False
+                
+```
+
+
+
+
 
 #### DFS
 

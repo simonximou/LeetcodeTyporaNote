@@ -1825,7 +1825,7 @@ class Solution(object):
 
 #### Red Black Tree
 
-#### **Rules That Every Red-Black Tree Follows:** 
+##### **Rules That Every Red-Black Tree Follows:** 
 
 1. Every node has a color either red or black.
 

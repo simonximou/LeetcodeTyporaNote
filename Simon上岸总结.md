@@ -3280,9 +3280,49 @@ class Solution(object):
                 return finder
 ```
 
+\162. Find Peak Element
 
+Medium
 
+63173804Add to ListShare
 
+A peak element is an element that is strictly greater than its neighbors.
+
+Given an integer array `nums`, find a peak element, and return its index. If the array contains multiple peaks, return the index to **any of the peaks**.
+
+You may imagine that `nums[-1] = nums[n] = -∞`.
+
+You must write an algorithm that runs in `O(log n)` time.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [1,2,3,1]
+Output: 2
+Explanation: 3 is a peak element and your function should return the index number 2.
+```
+
+```py
+class Solution(object):
+    def findPeakElement(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        #binary search, check middle vs its left and tight
+        #logn
+        left, right = 0, len(nums) - 1
+        while left < right:
+            mid1 = (left + right)//2
+            mid2 = mid1+1
+            if nums[mid1] < nums[mid2]:
+                left = mid2
+            else:
+                right = mid1
+        return left
+```
 
 
 
@@ -4366,6 +4406,308 @@ class Solution:
         return jump 
             
 ```
+
+### Bitwise Operation
+
+#### Background:
+
+- 从现代计算机中所有的数据二进制的形式存储在设备中。即 0、1 两种状态，计算机对二进制数据进行的运算(+、-、*、/)都是叫位运算，即将符号位共同参与运算的运算。
+
+- 所以，相比在代码中直接使用(+、-、*、/)运算符，合理的运用位运算更能显著提高代码在机器上的执行效率。
+
+#### **位操作符**
+
+- & 与运算 两个位都是 1 时，结果才为 1，否则为 0，如
+    1 0 0 1 1 
+  &  1 1 0 0 1 
+  `------------------------------` 
+    1 0 0 0 1 
+
+
+
+- | 或运算 两个位都是 0 时，结果才为 0，否则为 1，如
+    1 0 0 1 1 
+  |   1 1 0 0 1 
+  `------------------------------` 
+    1 1 0 1 1 
+
+
+
+- ^ 异或运算，两个位相同则为 0，不同则为 1，如
+    1 0 0 1 1 
+  ^  1 1 0 0 1 
+  `-----------------------------` 
+    0 1 0 1 0 
+
+
+
+- ~ 取反运算，0 则变为 1，1 则变为 0，如
+  ~   1 0 0 1 1 
+  `-----------------------------` 
+     0 1 1 0 0 
+
+
+
+- << 左移运算，向左进行移位操作，高位丢弃，低位补 0，如
+
+```text
+int a = 8;
+a << 3;
+移位前：0000 0000 0000 0000 0000 0000 0000 1000
+移位后：0000 0000 0000 0000 0000 0000 0100 0000
+```
+
+\>> 右移运算，向右进行移位操作，对无符号数，高位补 0，对于有符号数，高位补符号位，如
+
+```text
+unsigned int a = 8;
+a >> 3;
+移位前：0000 0000 0000 0000 0000 0000 0000 1000
+移位后：0000 0000 0000 0000 0000 0000 0000 0001
+
+int a = -8;
+a >> 3;
+移位前：1111 1111 1111 1111 1111 1111 1111 1000
+移位前：1111 1111 1111 1111 1111 1111 1111 1111
+```
+
+#### **常见位运算问题**
+
+##### 1. 位操作实现[乘除法](https://www.zhihu.com/search?q=乘除法&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A736472332})
+
+- 数 a 向右移一位，相当于将 a 除以 2；数 a 向左移一位，相当于将 a 乘以 2
+
+```text
+int a = 2;
+a >> 1; ---> 1
+a << 1; ---> 4
+```
+
+##### 2. 位操作交货两数
+
+- 位操作交换两数可以不需要第三个临时变量，虽然普通操作也可以做到，但是没有其效率高
+
+```text
+//普通操作
+void swap(int &a, int &b) {
+  a = a + b;
+  b = a - b;
+  a = a - b;
+}
+
+//位与操作
+void swap(int &a, int &b) {
+  a ^= b;
+  b ^= a;
+  a ^= b;
+}
+```
+
+位与操作解释：第一步：a ^= b ---> a = (a^b); 
+
+第二步：b ^= a ---> b = b^(a^b) ---> b = (b^b)^a = a
+
+第三步：a ^= b ---> a = (a^b)^a = (a^a)^b = b
+
+##### 3. 位操作判断[奇偶数](https://www.zhihu.com/search?q=奇偶数&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A736472332})
+
+- 只要根据数的最后一位是 0 还是 1 来决定即可，为 0 就是偶数，为 1 就是奇数。
+
+```text
+if(0 == (a & 1)) {
+ //偶数
+}
+```
+
+##### 4. 位操作交换符号
+
+- 交换符号将正数变成负数，负数变成正数
+
+```text
+int reversal(int a) {
+  return ~a + 1;
+}
+```
+
+整数取反加1，正好变成其对应的负数(补码表示)；负数取反加一，则变为其原码，即正数
+
+##### 5. 位操作求绝对值
+
+- 整数的绝对值是其本身，负数的绝对值正好可以对其进行取反加一求得，即我们首先判断其符号位（整数右移 31 位得到 0，负数右移 31 位得到 -1,即 [0xffffffff](https://www.zhihu.com/search?q=0xffffffff&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A736472332})），然后根据符号进行相应的操作
+
+```text
+int abs(int a) {
+  int i = a >> 31;
+  return i == 0 ? a : (~a + 1);
+}
+```
+
+上面的操作可以进行优化，可以将 i == 0 的条件判断语句去掉。我们都知道符号位 i 只有两种情况，即 i = 0 为正，i = -1 为负。对于任何数与 0 异或都会保持不变，与 -1 即 0xffffffff 进行异或就相当于对此数进行取反,因此可以将上面三目元算符转换为((a^i)-i)，即整数时 a 与 0 异或得到本身，再减去 0，负数时与 0xffffffff 异或将 a 进行取反，然后在加上 1，即减去 i(i =-1)
+
+```text
+int abs2(int a) {
+  int i = a >> 31;
+  return ((a^i) - i);
+}
+```
+
+##### 6. 位操作进行高低位交换
+
+- 给定一个 16 位的无符号整数，将其高 8 位与低 8 位进行交换，求出交换后的值，如：
+
+```text
+34520的二进制表示：
+10000110 11011000
+
+将其高8位与低8位进行交换，得到一个新的二进制数：
+11011000 10000110
+其十进制为55430
+```
+
+从上面移位操作我们可以知道，只要将无符号数 a>>8 即可得到其高 8 位移到低 8 位，高位补 0；将 a<<8 即可将 低 8 位移到高 8 位，低 8 位补 0，然后将 a>>8 和 a<<8 进行或操作既可求得交换后的结果。
+
+```text
+unsigned short a = 34520;
+a = (a >> 8) | (a << 8);
+```
+
+##### 7. 位操作进行二进制逆序
+
+将无符号数的二进制表示进行逆序，求取逆序后的结果，如
+
+```text
+数34520的二进制表示：
+10000110 11011000
+
+逆序后则为：
+00011011 01100001
+它的十进制为7009
+```
+
+在字符串逆序过程中，可以从字符串的首尾开始，依次交换两端的数据。在二进制中使用位的高低位交换会更方便进行处理，这里我们分组进行多步处理。
+
+- 第一步:以每 2 位为一组，组内进行高低位交换
+
+```text
+交换前： 10 00 01 10 11 01 10 00
+交换后： 01 00 10 01 11 10 01 00
+```
+
+- 第二步：在上面的基础上，以每 4 位为 1 组，组内高低位进行交换
+
+```text
+交换前： 0100 1001 1110 0100
+交换后： 0001 0110 1011 0001
+```
+
+- 第三步：以每 8 位为一组，组内高低位进行交换
+
+```text
+交换前： 00010110 10110001
+交换后： 01100001 00011011
+```
+
+- 第四步：以每16位为一组，组内高低位进行交换
+
+```text
+交换前： 0110000100011011
+交换后： 0001101101100001
+```
+
+对于上面的第一步，依次以 2 位作为一组，再进行组内高低位交换，这样处理起来比较繁琐，下面介绍另外一种方法进行处理。先分别取原数 10000110 11011000 的奇数位和偶数位，将空余位用 0 填充：
+
+```text
+原数：  10000110 11011000
+奇数位： 10000010 10001000
+偶数位： 00000100 01010000
+```
+
+再将奇数位右移一位，偶数位左移一位，此时将两个数据相或即可以达到奇偶位上数据交换的效果：
+
+```text
+原数：  10000110 11011000
+奇数位右移一位： 0 10000010 1000100
+偶数位左移一位：0000100 01010000 0
+两数相或得到： 01001001 11100100
+```
+
+上面的方法用位操作可以表示为：
+
+- 取a的奇数位并用 0 进行填充可以表示为：a & 0xAAAA
+- 取a的偶数为并用 0 进行填充可以表示为：a & 0x5555 因此，上面的第一步可以表示为：
+  a = ((a & 0xAAAA) >> 1) | ((a & 0x5555) << 1)
+  同理，可以得到其第二、三和四步为：
+  a = ((a & 0xCCCC) >> 2) | ((a & 0x3333) << 2)
+  a = ((a & 0xF0F0) >> 4) | ((a & 0x0F0F) << 4)
+  a = ((a & 0xFF00) >> 8) | ((a & 0x00FF) << 8)
+  因此整个操作为：
+
+```text
+unsigned short a = 34520;
+
+a = ((a & 0xAAAA) >> 1) | ((a & 0x5555) << 1);
+a = ((a & 0xCCCC) >> 2) | ((a & 0x3333) << 2);
+a = ((a & 0xF0F0) >> 4) | ((a & 0x0F0F) << 4);
+a = ((a & 0xFF00) >> 8) | ((a & 0x00FF) << 8);
+```
+
+##### 8. 位操作统计二进制中 1 的个数
+
+统计二进制1的个数可以分别获取每个二进制位数，然后再统计其1的个数，此方法效率比较低。这里介绍另外一种高效的方法，同样以 34520 为例，我们计算其 a &= (a-1)的结果：
+
+- 第一次：计算前：1000 0110 1101 1000 计算后：1000 0110 1101 0000
+- 第二次：计算前：1000 0110 1101 0000 计算后：1000 0110 1100 0000
+- 第二次：计算前：1000 0110 1100 0000 计算后：1000 0110 1000 0000 我们发现，没计算一次二进制中就少了一个 1，则我们可以通过下面方法去统计：
+
+```text
+count = 0  
+while(a){  
+  a = a & (a - 1);  
+  count++;  
+} 
+```
+
+#### Problems
+
+\191. Number of 1 Bits
+
+Easy
+
+3676856Add to ListShare
+
+Write a function that takes an unsigned integer and returns the number of '1' bits it has (also known as the [Hamming weight](http://en.wikipedia.org/wiki/Hamming_weight)).
+
+**Note:**
+
+- Note that in some languages, such as Java, there is no unsigned integer type. In this case, the input will be given as a signed integer type. It should not affect your implementation, as the integer's internal binary representation is the same, whether it is signed or unsigned.
+- In Java, the compiler represents the signed integers using [2's complement notation](https://en.wikipedia.org/wiki/Two's_complement). Therefore, in **Example 3**, the input represents the signed integer. `-3`.
+
+ 
+
+**Example 1:**
+
+```
+Input: n = 00000000000000000000000000001011
+Output: 3
+Explanation: The input binary string 00000000000000000000000000001011 has a total of three '1' bits.
+```
+
+```py
+class Solution(object):
+    def hammingWeight(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        count = 0  
+        while n:
+            n &= (n-1)
+            count += 1
+        return count
+        
+```
+
+
 
 
 

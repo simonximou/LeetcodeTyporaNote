@@ -3131,6 +3131,163 @@ class Solution(object):
                 
 ```
 
+\34. Find First and Last Position of Element in Sorted Array
+
+Medium
+
+11133302Add to ListShare
+
+Given an array of integers `nums` sorted in non-decreasing order, find the starting and ending position of a given `target` value.
+
+If `target` is not found in the array, return `[-1, -1]`.
+
+You must write an algorithm with `O(log n)` runtime complexity.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [5,7,7,8,8,10], target = 8
+Output: [3,4]
+```
+
+```py
+class Solution(object):
+    def searchRange(self, nums, target):
+        if not nums: 
+            return [-1, -1]
+        #find 
+        def searchLeft(nums, target):
+            start, end = 0, len(nums) - 1
+            while start + 1 < end:
+                mid = (start + end) / 2
+                if target > nums[mid]:
+                    start = mid 
+                else:
+                    end = mid
+            if nums[start] == target:
+                return start
+            elif nums[end] == target:
+                return end
+            else:
+                return -1
+
+
+        def searchRight(nums, target):
+            start, end = 0, len(nums) - 1
+            while start + 1 < end:
+                mid = (start + end) / 2
+                if target < nums[mid]:
+                    end = mid
+                else:
+                    start = mid
+            if nums[end] == target:
+                return end
+            elif nums[start] == target:
+                return start
+            else:
+                return -1
+        
+        left = searchLeft(nums, target)
+        right =  searchRight(nums, target)
+        return [left, right]   
+```
+
+\81. Search in Rotated Sorted Array II
+
+Medium
+
+4564731Add to ListShare
+
+There is an integer array `nums` sorted in non-decreasing order (not necessarily with **distinct** values).
+
+Before being passed to your function, `nums` is **rotated** at an unknown pivot index `k` (`0 <= k < nums.length`) such that the resulting array is `[nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]` (**0-indexed**). For example, `[0,1,2,4,4,4,5,6,6,7]` might be rotated at pivot index `5` and become `[4,5,6,6,7,0,1,2,4,4]`.
+
+Given the array `nums` **after** the rotation and an integer `target`, return `true` *if* `target` *is in* `nums`*, or* `false` *if it is not in* `nums`*.*
+
+You must decrease the overall operation steps as much as possible.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [2,5,6,0,0,1,2], target = 0
+Output: true
+```
+
+```py
+class Solution(object):
+    def search(self, nums, target):
+        start, end = 0, len(nums) - 1
+        while start + 1 < end:
+            mid = (start + end) / 2
+            if nums[mid] == target or nums[start] == target or nums[end] == target:
+                return True
+            if nums[start] < nums[mid]:
+                if nums[start] <= target <= nums[mid]:
+                    end = mid
+                else:
+                    start = mid
+            elif nums[end] > nums[mid]:
+                if nums[mid] <= target <= nums[end]:
+                    start = mid
+                else:
+                    end = mid
+            else:
+                start += 1
+                
+        if nums[start] == target or nums[end] == target:
+            return True
+        else:
+            return False
+        
+```
+
+\287. Find the Duplicate Number
+
+Medium
+
+144261773Add to ListShare
+
+Given an array of integers `nums` containing `n + 1` integers where each integer is in the range `[1, n]` inclusive.
+
+There is only **one repeated number** in `nums`, return *this repeated number*.
+
+You must solve the problem **without** modifying the array `nums` and uses only constant extra space.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [1,3,4,2,2]
+Output: 2
+```
+
+```py
+class Solution(object):
+    def findDuplicate(self, nums):
+        slow = fast = finder = 0
+        while True:
+            slow = nums[slow]
+            fast = nums[nums[fast]]
+            if slow == fast:
+                while finder != slow:
+                    finder = nums[finder]
+                    slow = nums[slow]
+                return finder
+```
+
+
+
+
+
+
+
+
+
 
 
 

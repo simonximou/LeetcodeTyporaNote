@@ -3324,9 +3324,44 @@ class Solution(object):
         return left
 ```
 
+#### Two Pointers and Sliding window
 
+\3. Longest Substring Without Repeating Characters
 
+Medium
 
+254911104Add to ListShare
+
+Given a string `s`, find the length of the **longest substring** without repeating characters.
+
+ 
+
+**Example 1:**
+
+```
+Input: s = "abcabcbb"
+Output: 3
+Explanation: The answer is "abc", with the length of 3.
+```
+
+```py
+class Solution(object):
+    def lengthOfLongestSubstring(self, s):
+        #use two pointer, when meet a repeated element, put slow pointer at the next element of repeated
+        slow, fast = 0,0
+        maxLen = 0
+        hashSet = set()
+        
+        while fast<len(s):
+            if s[fast] not in hashSet:
+                hashSet.add(s[fast])
+                fast += 1
+                maxLen = max(maxLen, len(hashSet))
+            else:
+                hashSet.remove(s[slow])
+                slow += 1
+        return maxLen
+```
 
 
 

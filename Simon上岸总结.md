@@ -3363,6 +3363,52 @@ class Solution(object):
         return maxLen
 ```
 
+\49. Group Anagrams
+
+Medium
+
+9840331Add to ListShare
+
+Given an array of strings `strs`, group **the anagrams** together. You can return the answer in **any order**.
+
+An **Anagram** is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
+
+ 
+
+**Example 1:**
+
+```
+Input: strs = ["eat","tea","tan","ate","nat","bat"]
+Output: [["bat"],["nat","tan"],["ate","eat","tea"]]
+```
+
+```py
+class Solution(object):
+    def groupAnagrams(self, strs):
+        """
+        :type strs: List[str]
+        :rtype: List[List[str]]
+        """
+        #first create a dict to hold res, then loop each element in the strs
+        #if sorted(i) in dict, put into the array, if not, create a new array in dict
+        res = {}
+        for i in strs:
+            j = ''.join(sorted(i))
+            if res.has_key(j):
+                res[j].append(i)
+            else:
+                res[j] = [i]
+        final = []
+        for i in res.values():
+            final.append(i)
+        return final
+    #another way to reduce time is to use [26] to make the key instead of sorting it 
+```
+
+
+
+
+
 
 
 

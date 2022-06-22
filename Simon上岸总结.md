@@ -3405,6 +3405,143 @@ class Solution(object):
     #another way to reduce time is to use [26] to make the key instead of sorting it 
 ```
 
+\560. Subarray Sum Equals K
+
+Medium
+
+13653437Add to ListShare
+
+Given an array of integers `nums` and an integer `k`, return *the total number of subarrays whose sum equals to* `k`.
+
+A subarray is a contiguous **non-empty** sequence of elements within an array.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [1,1,1], k = 2
+Output: 2
+```
+
+```py
+class Solution(object):
+    def subarraySum(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: int
+        """
+        #use hashmap and prefixsum 
+        hashmap = {}
+        sumArr, res = 0, 0
+        hashmap[0] = 1
+        
+        #loop thru every element in nums, adding into sum.
+        for i in nums:
+            sumArr += i
+            #if have found subarray(from [0]) that == sumArr - k, add into res based on freq
+            if hashmap.has_key(sumArr - k):
+                res += hashmap[sumArr-k]
+            
+            #adding subarrray into hashmap 
+            if hashmap.has_key(sumArr):
+                hashmap[sumArr] += 1
+            else:
+                hashmap[sumArr] = 1
+                
+        return res
+```
+
+\11. Container With Most Water
+
+Medium
+
+17753971Add to ListShare
+
+You are given an integer array `height` of length `n`. There are `n` vertical lines drawn such that the two endpoints of the `ith` line are `(i, 0)` and `(i, height[i])`.
+
+Find two lines that together with the x-axis form a container, such that the container contains the most water.
+
+Return *the maximum amount of water a container can store*.
+
+**Notice** that you may not slant the container.
+
+ 
+
+**Example 1:**
+
+![img](https://s3-lc-upload.s3.amazonaws.com/uploads/2018/07/17/question_11.jpg)
+
+```
+Input: height = [1,8,6,2,5,4,8,3,7]
+Output: 49
+Explanation: The above vertical lines are represented by array [1,8,6,2,5,4,8,3,7]. In this case, the max area of water (blue section) the container can contain is 49.
+```
+
+```py
+class Solution(object):
+    def maxArea(self, height):
+        #two pointer problem, moving towards middle, moving the lower one
+        slow, fast, res = 0, len(height) - 1, 0
+        for n in range(len(height)):
+            res = max(res, min(height[slow], height[fast]) * (fast - slow))
+            if height[fast] > height[slow]:
+                slow += 1
+            else:
+                fast -= 1
+        return res
+```
+
+\16. 3Sum Closest
+
+Medium
+
+6105263Add to ListShare
+
+Given an integer array `nums` of length `n` and an integer `target`, find three integers in `nums` such that the sum is closest to `target`.
+
+Return *the sum of the three integers*.
+
+You may assume that each input would have exactly one solution.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [-1,2,1,-4], target = 1
+Output: 2
+Explanation: The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
+```
+
+```py
+class Solution(object):
+    def threeSumClosest(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: int
+        """
+        #two pointer approach, first sort, then move around
+        nums = sorted(nums)
+        res = 10000000
+        for i in range(len(nums)-2):
+            left, right = i+1, len(nums) -1
+            while left < right:
+                sums = nums[i] + nums[left] + nums[right]
+                if abs(sums -target) < abs(res-target):
+                    res = sums
+                if sums < target:
+                    left +=1
+                elif sums > target:
+                    right -= 1
+                else:
+                    return target
+        return res
+
+            
+```
 
 
 
@@ -3412,6 +3549,15 @@ class Solution(object):
 
 
 
+
+
+
+
+
+
+
+
+ 
 
 #### DFS
 

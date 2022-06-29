@@ -3326,6 +3326,38 @@ class Solution(object):
 
 #### Two Pointers and Sliding window
 
+##### Template:
+
+```c++
+For most substring problem, we are given a string and need to find a substring of it which satisfy some restrictions. A general way is to use a hashmap assisted with two pointers. The template is given below.
+
+int findSubstring(string s){
+        vector<int> map(128,0);
+        int counter; // check whether the substring is valid
+        int begin=0, end=0; //two pointers, one point to tail and one  head
+        int d; //the length of substring
+
+        for() { /* initialize the hash map here */ }
+
+        while(end<s.size()){
+
+            if(map[s[end++]]-- ?){  /* modify counter here */ }
+
+            while(/* counter condition */){ 
+                 
+                 /* update d here if finding minimum*/
+
+                //increase begin to make it invalid/valid again
+                
+                if(map[s[begin++]]++ ?){ /*modify counter here*/ }
+            }  
+
+            /* update d here if finding maximum*/
+        }
+        return d;
+  }
+```
+
 \3. Longest Substring Without Repeating Characters
 
 Medium
@@ -3543,21 +3575,283 @@ class Solution(object):
             
 ```
 
+\424. Longest Repeating Character Replacement
 
+Medium
 
+4834194Add to ListShare
 
+You are given a string `s` and an integer `k`. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most `k` times.
 
-
-
-
-
-
-
-
-
-
+Return *the length of the longest substring containing the same letter you can get after performing the above operations*.
 
  
+
+**Example 1:**
+
+```
+Input: s = "ABAB", k = 2
+Output: 4
+Explanation: Replace the two 'A's with two 'B's or vice versa.
+```
+
+```py
+class Solution(object):
+    def characterReplacement(self, s, k):
+        """
+        :type s: str
+        :type k: int
+        :rtype: int
+        """
+        left, right = 0, -1
+        dic = collections.defaultdict(int)
+        maxChar, maxLength = 0, 0
+        
+        #for each element in s, add the count of the element in dict
+        for i in s:
+            dic[i] += 1
+            right += 1
+            maxChar = max(maxChar, dic[i])
+            #if replacement element more than k, move start to right
+            while(right-left+1-maxChar > k):
+                dic[s[left]] -= 1
+                left += 1
+            #reset maxLength
+            maxLength = max(maxLength, right-left+1)
+        return maxLength
+```
+
+\713. Subarray Product Less Than K
+
+Medium
+
+4134138Add to ListShare
+
+Given an array of integers `nums` and an integer `k`, return *the number of contiguous subarrays where the product of all the elements in the subarray is strictly less than* `k`.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [10,5,2,6], k = 100
+Output: 8
+Explanation: The 8 subarrays that have product less than 100 are:
+[10], [5], [2], [6], [10, 5], [5, 2], [2, 6], [5, 2, 6]
+Note that [10, 5, 2] is not included as the product of 100 is not strictly less than k.
+```
+
+```py
+class Solution(object):
+    def numSubarrayProductLessThanK(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: int
+        """
+        #sliding window, add subarray length
+        #[8, 2, 10] has 1 that contains 8, 2 contains 2, 3 contains 10, so total 6
+        left, count, multiplier = 0, 0, 1
+        for right in range(len(nums)):
+            multiplier *= nums[right]
+            while multiplier >= k and left <= right:
+                multiplier /= nums[left]
+                left += 1
+            count += (right - left + 1)
+        return count
+                
+```
+
+\567. Permutation in String
+
+Medium
+
+6267189Add to ListShare
+
+Given two strings `s1` and `s2`, return `true` *if* `s2` *contains a permutation of* `s1`*, or* `false` *otherwise*.
+
+In other words, return `true` if one of `s1`'s permutations is the substring of `s2`.
+
+ 
+
+**Example 1:**
+
+```
+Input: s1 = "ab", s2 = "eidbaooo"
+Output: true
+Explanation: s2 contains one permutation of s1 ("ba").
+```
+
+```py
+class Solution(object):
+    def checkInclusion(self, s1, s2):
+        """
+        :type s1: str
+        :type s2: str
+        :rtype: bool
+        """
+        if len(s1) > len(s2):
+            return False
+        #Sliding window + hashmap
+        left, right = 0, 0
+        need = collections.Counter(s1)
+        hashmap = collections.defaultdict(int)
+        counter = 0
+        
+        
+        while right < len(s2):
+            #change in window data
+            a = s2[right]
+            right += 1
+            if a in need:
+                hashmap[a] += 1
+                if hashmap[a] == need[a]:
+                    counter += 1
+            
+            
+            while right - left >= len(s1):
+                if counter == len(need):
+                    return True
+                b = s2[left]
+                if b in need:
+                    if hashmap[b] == need[b]:
+                        counter -= 1
+                    hashmap[b] -= 1
+                left += 1
+        return False 
+```
+
+\438. Find All Anagrams in a String
+
+Medium
+
+7756259Add to ListShare
+
+Given two strings `s` and `p`, return *an array of all the start indices of* `p`*'s anagrams in* `s`. You may return the answer in **any order**.
+
+An **Anagram** is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
+
+ 
+
+**Example 1:**
+
+```
+Input: s = "cbaebabacd", p = "abc"
+Output: [0,6]
+Explanation:
+The substring with start index = 0 is "cba", which is an anagram of "abc".
+The substring with start index = 6 is "bac", which is an anagram of "abc".
+```
+
+```py
+class Solution(object):
+    def findAnagrams(self, s2, s1):
+        """
+        :type s: str
+        :type p: str
+        :rtype: List[int]
+        """
+        if len(s1) > len(s2):
+            return []
+        #Sliding window + hashmap
+        left, right = 0, 0
+        need = collections.Counter(s1)
+        hashmap = collections.defaultdict(int)
+        counter = 0
+        res = []
+        
+        
+        while right < len(s2):
+            #change in window data
+            a = s2[right]
+            right += 1
+            if a in need:
+                hashmap[a] += 1
+                if hashmap[a] == need[a]:
+                    counter += 1
+            
+            
+            while right - left >= len(s1):
+                if counter == len(need):
+                    res.append(left)
+                b = s2[left]
+                if b in need:
+                    if hashmap[b] == need[b]:
+                        counter -= 1
+                    hashmap[b] -= 1
+                left += 1
+        return res
+```
+
+\76. Minimum Window Substring
+
+Hard
+
+10881545Add to ListShare
+
+Given two strings `s` and `t` of lengths `m` and `n` respectively, return *the **minimum window substring** of* `s` *such that every character in* `t` *(**including duplicates**) is included in the window. If there is no such substring**, return the empty string* `""`*.*
+
+The testcases will be generated such that the answer is **unique**.
+
+A **substring** is a contiguous sequence of characters within the string.
+
+ 
+
+**Example 1:**
+
+```
+Input: s = "ADOBECODEBANC", t = "ABC"
+Output: "BANC"
+Explanation: The minimum window substring "BANC" includes 'A', 'B', and 'C' from string t.
+```
+
+```py
+class Solution(object):
+    def minWindow(self, s, t):
+        """
+        :type s: str
+        :type t: str
+        :rtype: str
+        """
+        #typical sliding window problem, two pointers + hashmap
+        #initialize variables
+        if len(t) > len(s):
+            return ''
+        left, right = 0, 0
+        need = collections.Counter(t)
+        dic = collections.defaultdict(int)
+        counter = 0
+        resLen = sys.maxsize
+        start = 0
+        
+        while right < len(s):
+            #manage in window
+            a = s[right]
+            right += 1
+            if a in need:
+                dic[a] += 1
+                if dic[a] == need[a]:
+                    counter += 1
+            #manage out of window
+            while counter == len(need):
+                if(right - left < resLen):
+                    resLen = right - left
+                    start = left
+                b = s[left]
+                left += 1
+                if b in need:
+                    if need[b] == dic[b]:
+                        counter -= 1
+                    dic[b] -= 1
+        if resLen == sys.maxint:
+            return ""
+        else:
+            return s[start:start + resLen]
+```
+
+
+
+
 
 #### DFS
 
@@ -4633,6 +4927,161 @@ class Solution:
         return jump 
             
 ```
+
+### Matrix
+
+\54. Spiral Matrix
+
+Medium
+
+7631853Add to ListShare
+
+Given an `m x n` `matrix`, return *all elements of the* `matrix` *in spiral order*.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/11/13/spiral1.jpg)
+
+```
+Input: matrix = [[1,2,3],[4,5,6],[7,8,9]]
+Output: [1,2,3,6,9,8,7,4,5]
+```
+
+```py
+class Solution(object):
+    def spiralOrder(self, matrix):
+        """
+        :type matrix: List[List[int]]
+        :rtype: List[int]
+        """
+        res = []
+        if not matrix:
+            return res
+        rowStart, rowEnd = 0, len(matrix)-1
+        colStart, colEnd = 0, len(matrix[0])-1
+        while(rowStart<= rowEnd and colStart <= colEnd):
+            for i in range(colStart, colEnd+1):
+                res.append(matrix[rowStart][i])
+            rowStart += 1
+            for j in range(rowStart, rowEnd+1):
+                res.append(matrix[j][colEnd])
+            colEnd -= 1
+            if colStart > colEnd or rowStart > rowEnd:
+                break
+            for i in range(colEnd, colStart-1, -1):
+                res.append(matrix[rowEnd][i])
+            rowEnd -= 1
+            for j in range(rowEnd, rowStart-1, -1):
+                res.append(matrix[j][colStart])
+            colStart += 1
+        return res
+```
+
+\59. Spiral Matrix II
+
+Medium
+
+3781184Add to ListShare
+
+Given a positive integer `n`, generate an `n x n` `matrix` filled with elements from `1` to `n2` in spiral order.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/11/13/spiraln.jpg)
+
+```
+Input: n = 3
+Output: [[1,2,3],[8,9,4],[7,6,5]]
+```
+
+```py
+class Solution(object):
+    def generateMatrix(self, n):
+        """
+        :type n: int
+        :rtype: List[List[int]]
+        """
+        colStart, rowStart = 0, 0
+        colEnd, rowEnd = n-1, n-1
+        counter = 1
+        res = [[0] * n for _ in range(n)]
+        while colStart <= colEnd and rowStart <= rowEnd:
+            for i in range(colStart, colEnd+1):
+                res[rowStart][i] = counter
+                counter += 1
+            rowStart += 1
+            for j in range(rowStart, rowEnd+1):
+                res[j][colEnd] = counter
+                counter += 1
+            colEnd -= 1
+            for i in range(colEnd, colStart-1, -1):
+                res[rowEnd][i] = counter
+                counter += 1
+            rowEnd -= 1
+            for j in range(rowEnd, rowStart-1, -1):
+                res[j][colStart] = counter
+                counter += 1
+            colStart += 1
+        return res
+```
+
+\73. Set Matrix Zeroes
+
+Medium
+
+7770509Add to ListShare
+
+Given an `m x n` integer matrix `matrix`, if an element is `0`, set its entire row and column to `0`'s.
+
+You must do it [in place](https://en.wikipedia.org/wiki/In-place_algorithm).
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/08/17/mat1.jpg)
+
+```
+Input: matrix = [[1,1,1],[1,0,1],[1,1,1]]
+Output: [[1,0,1],[0,0,0],[1,0,1]]
+```
+
+```java
+class Solution {
+    public void setZeroes(int[][] matrix) {
+        
+        int m = matrix.length;
+        int n = matrix[0].length;
+        Set<Integer> hash_seti = new HashSet<>();
+        Set<Integer> hash_setj = new HashSet<>();
+        for(int i = 0; i < m; i++){
+            for(int j = 0; j < n; j++){
+                if(matrix[i][j] == 0){
+                    hash_seti.add(i);
+                    hash_setj.add(j);
+                }
+            }
+        }
+        for(int i = 0; i < m; i++){
+            for(int j = 0; j < n; j++){
+                if(hash_seti.contains(i) || hash_setj.contains(j)){
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+    }
+}
+```
+
+
+
+
+
+\
 
 ### Bitwise Operation
 

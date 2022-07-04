@@ -4061,6 +4061,362 @@ class Solution(object):
             self.dfs(matrix, x, y, visited, m, n)
 ```
 
+\721. Accounts Merge
+
+Medium
+
+4411799Add to ListShare
+
+Given a list of `accounts` where each element `accounts[i]` is a list of strings, where the first element `accounts[i][0]` is a name, and the rest of the elements are **emails** representing emails of the account.
+
+Now, we would like to merge these accounts. Two accounts definitely belong to the same person if there is some common email to both accounts. Note that even if two accounts have the same name, they may belong to different people as people could have the same name. A person can have any number of accounts initially, but all of their accounts definitely have the same name.
+
+After merging the accounts, return the accounts in the following format: the first element of each account is the name, and the rest of the elements are emails **in sorted order**. The accounts themselves can be returned in **any order**.
+
+ 
+
+**Example 1:**
+
+```
+Input: accounts = [["John","johnsmith@mail.com","john_newyork@mail.com"],["John","johnsmith@mail.com","john00@mail.com"],["Mary","mary@mail.com"],["John","johnnybravo@mail.com"]]
+Output: [["John","john00@mail.com","john_newyork@mail.com","johnsmith@mail.com"],["Mary","mary@mail.com"],["John","johnnybravo@mail.com"]]
+Explanation:
+The first and second John's are the same person as they have the common email "johnsmith@mail.com".
+The third John and Mary are different people as none of their email addresses are used by other accounts.
+We could return these lists in any order, for example the answer [['Mary', 'mary@mail.com'], ['John', 'johnnybravo@mail.com'], 
+['John', 'john00@mail.com', 'john_newyork@mail.com', 'johnsmith@mail.com']] would still be accepted.
+```
+
+```py
+class Solution(object):
+    def accountsMerge(self, accounts):
+        """
+        :type accounts: List[List[str]]
+        :rtype: List[List[str]]
+        """
+        #set up
+        res = []
+        graph = collections.defaultdict(list)
+        visited = [False] * len(accounts)
+        
+        #build graph
+        for i, account in enumerate(accounts):
+            for j in range(1, len(account)):
+                graph[account[j]].append(i)
+        
+        #dfs
+        def dfs(i, emails):
+            if visited[i]:
+                return
+            visited[i] = True
+            for j in range(1, len(accounts[i])):
+                email = accounts[i][j]
+                emails.add(email)
+                for neibor in graph[email]:
+                    dfs(neibor, emails)
+                
+        #walk thru and append to res
+        for i, account in enumerate(accounts):
+            if visited[i]:
+                continue
+            name, emails = account[0], set()
+            dfs(i, emails)
+            res.append([name] + sorted(emails))
+        return res
+```
+
+\547. Number of Provinces
+
+Medium
+
+5434245Add to ListShare
+
+There are `n` cities. Some of them are connected, while some are not. If city `a` is connected directly with city `b`, and city `b` is connected directly with city `c`, then city `a` is connected indirectly with city `c`.
+
+A **province** is a group of directly or indirectly connected cities and no other cities outside of the group.
+
+You are given an `n x n` matrix `isConnected` where `isConnected[i][j] = 1` if the `ith` city and the `jth` city are directly connected, and `isConnected[i][j] = 0` otherwise.
+
+Return *the total number of **provinces***.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/12/24/graph1.jpg)
+
+```
+Input: isConnected = [[1,1,0],[1,1,0],[0,0,1]]
+Output: 2
+```
+
+```py
+class Solution(object):
+    def findCircleNum(self, isConnected):
+        """
+        :type isConnected: List[List[int]]
+        :rtype: int
+        """
+                #dfs and a visited list
+        #ineach loop
+        
+        count = 0
+        visited = [0] * len(isConnected)
+        
+        #dfs
+        def dfs(i):
+            for j in range(len(isConnected)):
+                if isConnected[i][j] == 1 and visited[j] == 0:
+                    visited[j] = 1
+                    dfs(j)     
+        
+        
+        #walk thru the list and return graph len
+        for i in range(len(visited)):
+            if visited[i] == 0:
+                dfs(i)
+                count += 1
+        return count
+```
+
+\339. Nested List Weight Sum
+
+Medium
+
+1369312Add to ListShare
+
+You are given a nested list of integers `nestedList`. Each element is either an integer or a list whose elements may also be integers or other lists.
+
+The **depth** of an integer is the number of lists that it is inside of. For example, the nested list `[1,[2,2],[[3],2],1]` has each integer's value set to its **depth**.
+
+Return *the sum of each integer in* `nestedList` *multiplied by its **depth***.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/01/14/nestedlistweightsumex1.png)
+
+```
+Input: nestedList = [[1,1],2,[1,1]]
+Output: 10
+Explanation: Four 1's at depth 2, one 2 at depth 1. 1*2 + 1*2 + 2*1 + 1*2 + 1*2 = 10.
+```
+
+```py
+class Solution(object):
+    def depthSum(self, nestedList):
+        """
+        :type nestedList: List[NestedInteger]
+        :rtype: int
+        """
+        #kinda like a dfs, for each element, call helper function
+        return self.helper(nestedList, 1)
+    
+    def helper(self, i, depth):
+        total = 0
+        for lists in i:
+            if lists.isInteger():
+                total += lists.getInteger() * depth
+            else:
+                total += self.helper(lists.getList(), depth+1)
+        return total
+```
+
+\364. Nested List Weight Sum II
+
+Medium
+
+1011303Add to ListShare
+
+You are given a nested list of integers `nestedList`. Each element is either an integer or a list whose elements may also be integers or other lists.
+
+The **depth** of an integer is the number of lists that it is inside of. For example, the nested list `[1,[2,2],[[3],2],1]` has each integer's value set to its **depth**. Let `maxDepth` be the **maximum depth** of any integer.
+
+The **weight** of an integer is `maxDepth - (the depth of the integer) + 1`.
+
+Return *the sum of each integer in* `nestedList` *multiplied by its **weight***.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/03/27/nestedlistweightsumiiex1.png)
+
+```
+Input: nestedList = [[1,1],2,[1,1]]
+Output: 8
+Explanation: Four 1's with a weight of 1, one 2 with a weight of 2.
+1*1 + 1*1 + 2*2 + 1*1 + 1*1 = 8
+```
+
+```py
+class Solution:
+    def depthSumInverse(self, nestedList: List[NestedInteger]) -> int:
+                #similar to part 1, adding a loop at the beginning to find the max depth
+        #then use dfs to loop and find the total
+        maxDepth = self.maxDepth(nestedList)
+        return self.dfs(maxDepth, nestedList, 1)
+    
+    
+    
+    #find the total
+    def dfs(self, maxDepth, lists, depth):
+        total = 0
+        for i in lists:
+            if i.isInteger():
+                total += i.getInteger() * (maxDepth - depth + 1)
+            else:
+                total += self.dfs(maxDepth, i.getList(), depth+1)
+        return total
+        
+        
+        
+    # find maxDepth using DFS 
+    def maxDepth(self, lists):
+        maxDepth = 1
+        for i in lists:
+            if i.isInteger():
+                continue
+            else:
+                maxDepth = max(self.maxDepth(i.getList())+1, maxDepth)
+        return maxDepth
+```
+
+```py
+class Solution(object):
+    def depthSumInverse(self, nestedList):
+        """
+        :type nestedList: List[NestedInteger]
+        :rtype: int
+        """
+        #similar to part 1, adding a loop at the beginning to find the max depth
+        #then use dfs to loop and find the total
+        self.maxDepth = 0
+        res = []
+        
+        def dfs(lists, depth):
+            self.maxDepth = max(depth, self.maxDepth)
+            for i in lists:
+                if i.isInteger():
+                    res.append((depth, i.getInteger()))
+                else:
+                    dfs(i.getList(), depth+1)
+            
+        dfs(nestedList, 0)
+        total = 0
+        for depth, val in res:
+            total += (self.maxDepth-depth+1)*val
+        return total
+```
+
+\426. Convert Binary Search Tree to Sorted Doubly Linked List
+
+Medium
+
+2259179Add to ListShare
+
+Convert a **Binary Search Tree** to a sorted **Circular Doubly-Linked List** in place.
+
+You can think of the left and right pointers as synonymous to the predecessor and successor pointers in a doubly-linked list. For a circular doubly linked list, the predecessor of the first element is the last element, and the successor of the last element is the first element.
+
+We want to do the transformation **in place**. After the transformation, the left pointer of the tree node should point to its predecessor, and the right pointer should point to its successor. You should return the pointer to the smallest element of the linked list.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2018/10/12/bstdlloriginalbst.png)
+
+```
+Input: root = [4,2,5,1,3]
+```
+
+```py
+"""
+# Definition for a Node.
+class Node(object):
+    def __init__(self, val, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+"""
+
+class Solution(object):
+    def treeToDoublyList(self, root):
+        """
+        :type root: Node
+        :rtype: Node
+        """
+        #using dfs because going down
+        if not root:
+            return
+        head, tail = self.dfs(root)
+        head.left = tail
+        tail.right = head
+        return head
+
+    
+    def dfs(self, root):
+        if not root:
+            return None, None
+        leftHead, leftTail = self.dfs(root.left)
+        rightHead, rightTail = self.dfs(root.right)
+        if leftTail:
+            leftTail.right = root
+            root.left = leftTail
+        if rightHead:
+            root.right = rightHead
+            rightHead.left = root
+        if leftHead:
+            head = leftHead
+        else:
+            head = root
+        if rightTail:
+            tail = rightTail
+        else:
+            tail = root
+        return head, tail
+```
+
+\2096. Step-By-Step Directions From a Binary Tree Node to Another
+
+Medium
+
+115275Add to ListShare
+
+You are given the `root` of a **binary tree** with `n` nodes. Each node is uniquely assigned a value from `1` to `n`. You are also given an integer `startValue` representing the value of the start node `s`, and a different integer `destValue` representing the value of the destination node `t`.
+
+Find the **shortest path** starting from node `s` and ending at node `t`. Generate step-by-step directions of such path as a string consisting of only the **uppercase** letters `'L'`, `'R'`, and `'U'`. Each letter indicates a specific direction:
+
+- `'L'` means to go from a node to its **left child** node.
+- `'R'` means to go from a node to its **right child** node.
+- `'U'` means to go from a node to its **parent** node.
+
+Return *the step-by-step directions of the **shortest path** from node* `s` *to node* `t`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/11/15/eg1.png)
+
+```
+Input: root = [5,1,2,3,null,6,4], startValue = 3, destValue = 6
+Output: "UURL"
+Explanation: The shortest path is: 3 → 1 → 5 → 2 → 6.
+```
+
+```
+
+```
+
+
+
+
+
+
+
 
 
 

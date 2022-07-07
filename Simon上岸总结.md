@@ -4411,6 +4411,95 @@ Explanation: The shortest path is: 3 → 1 → 5 → 2 → 6.
 
 ```
 
+#### BFS
+
+**200. Number of Islands**
+
+Given an `m x n` 2D binary grid `grid` which represents a map of `'1'`s (land) and `'0'`s (water), return *the number of islands*.
+
+An **island** is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
+
+**Example 1:**
+
+```
+Input: grid = [
+  ["1","1","1","1","0"],
+  ["1","1","0","1","0"],
+  ["1","1","0","0","0"],
+  ["0","0","0","0","0"]
+]
+Output: 1
+```
+
+```python
+from collections import deque
+class Solution(object):
+    def numIslands(self, grid):
+        if not grid:
+            return 0
+        res = 0
+        check = [[False for _ in range(len(grid[0]))] for _ in range(len(grid))]
+        for row in range(len(grid)):
+            for col in range(len(grid[0])):
+                if grid[row][col] == "1" and check[row][col] == False:
+                    res +=1 
+                    self.bfs(check, row, col, grid)
+        return res
+        
+        
+    def bfs(self, check, row, col, grid):
+        queue = deque([(row, col)])
+        while queue:
+            row, col = queue.popleft()
+            if 0 <= row < len(grid) and 0 <= col < len(grid[0]) and grid[row][col] == "1" and check[row][col] == False:
+                check[row][col] = True
+                queue.append([(row + 1, col), (row, col + 1), (row - 1, col), (row, col - 1)])
+```
+
+**130. Surrounded Regions**
+
+Given an `m x n` matrix `board` containing `'X'` and `'O'`, *capture all regions that are 4-directionally surrounded by* `'X'`.
+
+A region is **captured** by flipping all `'O'`s into `'X'`s in that surrounded region.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/19/xogrid.jpg)
+
+```
+Input: board = [["X","X","X","X"],["X","O","O","X"],["X","X","O","X"],["X","O","X","X"]]
+Output: [["X","X","X","X"],["X","X","X","X"],["X","X","X","X"],["X","O","X","X"]]
+Explanation: Surrounded regions should not be on the border, which means that any 'O' on the border of the board are not flipped to 'X'. Any 'O' that is not on the border and it is not connected to an 'O' on the border will be flipped to 'X'. Two cells are connected if they are adjacent cells connected horizontally or vertically.
+```
+
+```python
+class Solution(object):
+    def solve(self, board):
+        if not board:
+            return [[]]
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if board[i][j] == "O":
+                    self.bfs(board, i, j)
+        return board
+    def bfs(self, board, i, j):
+        print 1
+        if board[i + 1][j] == "O":
+            board[i][j] = "X"
+            self.bfs(board, i+1, j)
+        if board[i - 1][j] == "O":
+            board[i][j] = "X"
+            self.bfs(board, i-1, j)
+        if board[i][j] == "O":
+            board[i][j+1] = "X"
+            self.bfs(board, i, j+1)
+        if board[i][j-1] == "O":
+            board[i][j] = "X"
+            self.bfs(board, i, j-1)
+```
+
 
 
 
@@ -4956,96 +5045,214 @@ class Solution:
         return res
 ```
 
+\37. Sudoku Solver
 
+Hard
 
-### BFS
+5676163Add to ListShare
 
-**200. Number of Islands**
+Write a program to solve a Sudoku puzzle by filling the empty cells.
 
-Given an `m x n` 2D binary grid `grid` which represents a map of `'1'`s (land) and `'0'`s (water), return *the number of islands*.
+A sudoku solution must satisfy **all of the following rules**:
 
-An **island** is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
+1. Each of the digits `1-9` must occur exactly once in each row.
+2. Each of the digits `1-9` must occur exactly once in each column.
+3. Each of the digits `1-9` must occur exactly once in each of the 9 `3x3` sub-boxes of the grid.
 
-**Example 1:**
-
-```
-Input: grid = [
-  ["1","1","1","1","0"],
-  ["1","1","0","1","0"],
-  ["1","1","0","0","0"],
-  ["0","0","0","0","0"]
-]
-Output: 1
-```
-
-```python
-from collections import deque
-class Solution(object):
-    def numIslands(self, grid):
-        if not grid:
-            return 0
-        res = 0
-        check = [[False for _ in range(len(grid[0]))] for _ in range(len(grid))]
-        for row in range(len(grid)):
-            for col in range(len(grid[0])):
-                if grid[row][col] == "1" and check[row][col] == False:
-                    res +=1 
-                    self.bfs(check, row, col, grid)
-        return res
-        
-        
-    def bfs(self, check, row, col, grid):
-        queue = deque([(row, col)])
-        while queue:
-            row, col = queue.popleft()
-            if 0 <= row < len(grid) and 0 <= col < len(grid[0]) and grid[row][col] == "1" and check[row][col] == False:
-                check[row][col] = True
-                queue.append([(row + 1, col), (row, col + 1), (row - 1, col), (row, col - 1)])
-```
-
-**130. Surrounded Regions**
-
-Given an `m x n` matrix `board` containing `'X'` and `'O'`, *capture all regions that are 4-directionally surrounded by* `'X'`.
-
-A region is **captured** by flipping all `'O'`s into `'X'`s in that surrounded region.
+The `'.'` character indicates empty cells.
 
  
 
 **Example 1:**
 
-![img](https://assets.leetcode.com/uploads/2021/02/19/xogrid.jpg)
+![img](https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Sudoku-by-L2G-20050714.svg/250px-Sudoku-by-L2G-20050714.svg.png)
 
 ```
-Input: board = [["X","X","X","X"],["X","O","O","X"],["X","X","O","X"],["X","O","X","X"]]
-Output: [["X","X","X","X"],["X","X","X","X"],["X","X","X","X"],["X","O","X","X"]]
-Explanation: Surrounded regions should not be on the border, which means that any 'O' on the border of the board are not flipped to 'X'. Any 'O' that is not on the border and it is not connected to an 'O' on the border will be flipped to 'X'. Two cells are connected if they are adjacent cells connected horizontally or vertically.
+Input: board = [["5","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],["8",".",".",".","6",".",".",".","3"],["4",".",".","8",".","3",".",".","1"],["7",".",".",".","2",".",".",".","6"],[".","6",".",".",".",".","2","8","."],[".",".",".","4","1","9",".",".","5"],[".",".",".",".","8",".",".","7","9"]]
+Output: [["5","3","4","6","7","8","9","1","2"],["6","7","2","1","9","5","3","4","8"],["1","9","8","3","4","2","5","6","7"],["8","5","9","7","6","1","4","2","3"],["4","2","6","8","5","3","7","9","1"],["7","1","3","9","2","4","8","5","6"],["9","6","1","5","3","7","2","8","4"],["2","8","7","4","1","9","6","3","5"],["3","4","5","2","8","6","1","7","9"]]
 ```
 
-```python
+```py
 class Solution(object):
-    def solve(self, board):
-        if not board:
-            return [[]]
-        for i in range(len(board)):
-            for j in range(len(board[0])):
-                if board[i][j] == "O":
-                    self.bfs(board, i, j)
-        return board
-    def bfs(self, board, i, j):
-        print 1
-        if board[i + 1][j] == "O":
-            board[i][j] = "X"
-            self.bfs(board, i+1, j)
-        if board[i - 1][j] == "O":
-            board[i][j] = "X"
-            self.bfs(board, i-1, j)
-        if board[i][j] == "O":
-            board[i][j+1] = "X"
-            self.bfs(board, i, j+1)
-        if board[i][j-1] == "O":
-            board[i][j] = "X"
-            self.bfs(board, i, j-1)
+    def solveSudoku(self, board):
+        """
+        :type board: List[List[str]]
+        :rtype: None Do not return anything, modify board in-place instead.
+        """
+
+        self.backtracking(board, 0class Solution(object):
+    def solveSudoku(self, board):
+        """
+        :type board: List[List[str]]
+        :rtype: None Do not return anything, modify board in-place instead.
+        """
+        #in place change
+        self.backtracking(board, 0, 0)
+        return
+            
+    def backtracking(self, board, i, j):
+        #move to next valid one
+        while board[i][j] != ".":
+            j += 1
+            if j == 9:
+                i += 1
+                j = 0
+            #passes last row, all good
+            if i == 9:
+                return True
+        
+        #backtracking, try 1-9 on each slot, if valid, put it in and call backtracking on it
+        for char in range(1, 10):
+            if self.isValid(board, i, j, str(char)):
+                board[i][j] = str(char)
+                if self.backtracking(board, i, j):
+                    return True
+        board[i][j] = "."
+        return False
+       
+    #test if num is valid in a slot of board  
+    def isValid(self, board, i, j, num):
+        for n in range(9):
+            if board[n][j] == num:
+                return False
+            if board[i][n] == num:
+                return False
+            if board[(i/3)*3 + n/3][(j/3)*3 + n%3] == num:
+                return False
+        return True, 0)
+        return
+        
+        
+    def backtracking(self, board, i, j):
+        while board[i][j] != ".":
+            j += 1
+            if j == 9:
+                i += 1
+                j = 0
+            if i == 9:
+                return True
+        for char in range(1, 10):
+            if self.isValid(board, i, j, str(char)):
+                board[i][j] = str(char)
+                if self.backtracking(board, i, j):
+                    return True
+        board[i][j] = "."
+        return False
+        
+        
+        
+    def isValid(self, board, i, j, num):
+        for n in range(9):
+            if board[n][j] == num:
+                return False
+            if board[i][n] == num:
+                return False
+            if board[(i/3)*3 + n/3][(j/3)*3 + n%3] == num:
+                return False
+        return True
+      
 ```
+
+\22. Generate Parentheses
+
+Medium
+
+13737520Add to ListShare
+
+Given `n` pairs of parentheses, write a function to *generate all combinations of well-formed parentheses*.
+
+ 
+
+**Example 1:**
+
+```
+Input: n = 3
+Output: ["((()))","(()())","(())()","()(())","()()()"]
+```
+
+```py
+class Solution(object):
+    def generateParenthesis(self, n):
+        """
+        :type n: int
+        :rtype: List[str]
+        """
+#         res = []
+#         paren = ""
+#         self.backtrack(n, paren, res)
+#         return res
+        
+#     def backtrack(self, n, paren, res):
+#         a = b = 0
+#         for i in paren:
+#             if i == "(":
+#                 a += 1
+#             else:
+#                 b += 1
+#         if b > len(paren)/2 or a > n or b > n:
+#             return
+#         if len(paren) == n*2:
+#             res.append(paren)
+#             return
+#         for i in ["(", ")"]:
+#             self.backtrack(n, paren + i, res)
+        def paren(left, right, curr, res):
+			# 'evaluate current string
+			# if we are out of brackets to add, we must be at a valid string
+			if left == 0 and right == 0:
+				res.append(curr)
+				return
+
+			# recursive call: add either open or close
+			# if adding open bracket is valid
+			if left > 0:
+				# add open bracket, decr count
+				paren(left-1, right, curr + "(", res)
+
+			# if adding close bracket is valid
+			if right > left:
+				# add close bracket, decr count
+				paren(left, right-1, curr + ")", res)
+
+			return res
+		# end paren()
+
+        res = paren(n, n, '', [])
+
+        return res
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5283,6 +5490,75 @@ class Solution:
         return jump 
             
 ```
+
+### Union Find
+
+#### Idea:
+
+```java
+class UF {
+	// 记录连通分量个数
+    private int count;
+    // 存储若⼲棵树
+    private int[] parent;
+    // 记录树的“重量”
+    private int[] size;
+    public UF(int n) {
+        this.count = n;
+        parent = new int[n];
+        size = new int[n];
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+            size[i] = 1;
+    	}
+    }
+    /* 将 p 和 q 连通 */
+    public void union(int p, int q) {
+        int rootP = find(p);
+        int rootQ = find(q);
+        if (rootP == rootQ):
+        	return;
+        // ⼩树接到⼤树下⾯，较平衡
+        if (size[rootP] > size[rootQ]) {
+            parent[rootQ] = rootP;
+            size[rootP] += size[rootQ];
+        } else {
+            parent[rootP] = rootQ;
+            size[rootQ] += size[rootP];
+        }
+        count--;
+    }
+    /* 判断 p 和 q 是否互相连通 */
+    public boolean connected(int p, int q) {
+        int rootP = find(p);
+        int rootQ = find(q);
+        // 处于同⼀棵树上的节点，相互连通
+        return rootP == rootQ;
+    }
+    /* 返回节点 x 的根节点 */
+    private int find(int x) {
+        while (parent[x] != x) {
+            // 进⾏路径压缩
+            parent[x] = parent[parent[x]];
+            x = parent[x];
+        }
+        return x;
+    }
+    public int count() {
+    	return count;
+    }
+}
+算法的关键点有 3 个：
+1、⽤ parent 数组记录每个节点的⽗节点，相当于指向⽗节点的指针，所
+以 parent 数组内实际存储着⼀个森林（若⼲棵多叉树）。
+2、⽤ size 数组记录着每棵树的重量，⽬的是让 union 后树依然拥有平
+衡性，⽽不会退化成链表，影响操作效率。
+3、在 find 函数中进⾏路径压缩，保证任意树的⾼度保持在常数，使得
+union 和 connected API 时间复杂度为 O(1)。
+
+```
+
+
 
 ### Matrix
 

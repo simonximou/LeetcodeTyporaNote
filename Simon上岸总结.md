@@ -1,22 +1,5 @@
 # Simon刷题笔记
 
-## Algos
-
-1. Searching
-   - Binary search
-   - DFS
-   - BFS
-2. Ordering
-   - Bubble sort
-   - Selection Sort
-   - Insertion Sort
-   - Quick Sort
-   - 
-3. Structure
-4. String
-5. Similarity
-6. Optimization
-
 
 
 ## Leetcode
@@ -5557,6 +5540,145 @@ class UF {
 union 和 connected API 时间复杂度为 O(1)。
 
 ```
+
+\200. Number of Islands
+
+Medium
+
+14664344Add to ListShare
+
+Given an `m x n` 2D binary grid `grid` which represents a map of `'1'`s (land) and `'0'`s (water), return *the number of islands*.
+
+An **island** is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
+
+**Example 1:**
+
+```
+Input: grid = [
+  ["1","1","1","1","0"],
+  ["1","1","0","1","0"],
+  ["1","1","0","0","0"],
+  ["0","0","0","0","0"]
+]
+Output: 1
+```
+
+```py
+class Solution(object):
+    def numIslands(self, grid):
+        """
+        :type grid: List[List[str]]
+        :rtype: int
+        """
+        #union find 
+        #first create count and parent[]
+        row = len(grid)
+        col = len(grid[0])
+        
+        self.count = sum(grid[i][j] == "1" for i in range(row) for j in range(col))
+        parent = [i for i in range(row*col)]
+        rank = [0] * row*col
+
+        #define find and union
+        def find(x):
+            if parent[x] != x:
+                parent[x] = find(parent[x])
+            return parent[x]
+
+        def union(i, j):
+            rooti, rootj = find(i), find(j)
+            if rooti == rootj:
+                return
+            if rank[i] > rank[j]:
+                parent[rootj] = rooti
+                rank[rooti] = max(rank[rooti], rank[rootj]+1)
+            else:
+                parent[rooti] = rootj
+                rank[rootj] = max(rank[rootj], rank[rooti]+1)
+            self.count -= 1
+            return
+
+        for i in range(row):
+            for j in range(col):
+                if grid[i][j] == "0":
+                    continue
+                grid[i][j] = "0"
+                index = i*col + j
+                if j < col-1 and grid[i][j+1] == "1":
+                    union(index, index+1)
+                if i < row-1 and grid[i+1][j] == "1":
+                    union(index, index+col)
+        return self.count
+```
+
+\547. Number of Provinces
+
+Medium
+
+5493245Add to ListShare
+
+There are `n` cities. Some of them are connected, while some are not. If city `a` is connected directly with city `b`, and city `b` is connected directly with city `c`, then city `a` is connected indirectly with city `c`.
+
+A **province** is a group of directly or indirectly connected cities and no other cities outside of the group.
+
+You are given an `n x n` matrix `isConnected` where `isConnected[i][j] = 1` if the `ith` city and the `jth` city are directly connected, and `isConnected[i][j] = 0` otherwise.
+
+Return *the total number of **provinces***.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/12/24/graph1.jpg)
+
+```
+Input: isConnected = [[1,1,0],[1,1,0],[0,0,1]]
+Output: 2
+```
+
+```py
+class Solution(object):
+    def findCircleNum(self, isConnected):
+        """
+        :type isConnected: List[List[int]]
+        :rtype: int
+        """
+        #union find
+        #initialize count, parent
+        row = len(isConnected)
+        col = len(isConnected[0])
+        self.count = row
+        parent = [i for i in range(row)]
+        
+        
+        #define find
+        def find(x):
+            if parent[x] != x:
+                return find(parent[x])
+            return parent[x]
+    
+        #define union 
+        def union(i, j):
+            rooti, rootj = find(i), find(j)
+            if rooti == rootj:
+                return
+            parent[rootj] = rooti
+            self.count -= 1
+            return
+        
+        for i in range(row):
+            for j in range(col):
+                print(self.count)
+                if isConnected[i][j] == 1 and i != j:
+                    union(i, j)
+                    
+        return self.count
+        
+```
+
+
+
+
 
 
 

@@ -5541,6 +5541,8 @@ union 和 connected API 时间复杂度为 O(1)。
 
 ```
 
+<img src="C:\Users\zx616\AppData\Roaming\Typora\typora-user-images\image-20220707234259478.png" alt="image-20220707234259478" style="zoom: 33%;" />
+
 \200. Number of Islands
 
 Medium

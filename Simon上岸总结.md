@@ -5541,7 +5541,7 @@ union 和 connected API 时间复杂度为 O(1)。
 
 ```
 
-<img src="C:\Users\zx616\AppData\Roaming\Typora\typora-user-images\image-20220707234259478.png" alt="image-20220707234259478" style="zoom: 33%;" />
+<img src="C:\Users\Simon\AppData\Roaming\Typora\typora-user-images\image-20220707234921099.png" alt="image-20220707234921099" style="zoom:33%;" />
 
 \200. Number of Islands
 
@@ -5678,9 +5678,339 @@ class Solution(object):
         
 ```
 
+\1319. Number of Operations to Make Network Connected
 
+Medium
 
+234434Add to ListShare
 
+There are `n` computers numbered from `0` to `n - 1` connected by ethernet cables `connections` forming a network where `connections[i] = [ai, bi]` represents a connection between computers `ai` and `bi`. Any computer can reach any other computer directly or indirectly through the network.
+
+You are given an initial computer network `connections`. You can extract certain cables between two directly connected computers, and place them between any pair of disconnected computers to make them directly connected.
+
+Return *the minimum number of times you need to do this in order to make all the computers connected*. If it is not possible, return `-1`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/01/02/sample_1_1677.png)
+
+```
+Input: n = 4, connections = [[0,1],[0,2],[1,2]]
+Output: 1
+Explanation: Remove cable between computer 1 and 2 and place between computers 1 and 3.
+```
+
+```py
+class Solution(object):
+    def makeConnected(self, n, connections):
+        """
+        :type n: int
+        :type connections: List[List[int]]
+        :rtype: int
+        """
+        #union find:
+        #since we only need n-1 cable to connect n comps, we can use union to connect
+        #each computer, if we see the root of two comps are same, we have an extra cable
+        #return -1 if extra < non-connected
+        #return non-connected
+        
+        #initialize extra, parent, (rank)
+        if len(connections) < n-1:
+            return -1
+        count = n
+        parent = [i for i in range(n)]
+        rank = [0] * n
+        
+        #find
+        def find(x):
+            if parent[x] != x:
+                return find(parent[x])
+            return parent[x]
+        
+        #union    
+        for i, j in connections:
+            rooti, rootj = find(i), find(j)
+            if rooti != rootj:
+                if rank[rooti] > rank[rootj]:
+                    rooti, rootj = rootj, rooti
+                parent[rooti] = rootj 
+                rank[rootj] = rank[rootj] + rank[rooti]
+                count -= 1
+        return count - 1
+            
+```
+
+\990. Satisfiability of Equality Equations
+
+Medium
+
+167821Add to ListShare
+
+You are given an array of strings `equations` that represent relationships between variables where each string `equations[i]` is of length `4` and takes one of two different forms: `"xi==yi"` or `"xi!=yi"`.Here, `xi` and `yi` are lowercase letters (not necessarily different) that represent one-letter variable names.
+
+Return `true` *if it is possible to assign integers to variable names so as to satisfy all the given equations, or* `false` *otherwise*.
+
+ 
+
+**Example 1:**
+
+```
+Input: equations = ["a==b","b!=a"]
+Output: false
+Explanation: If we assign say, a = 1 and b = 1, then the first equation is satisfied, but not the second.
+There is no way to assign the variables to satisfy both equations.
+```
+
+```py
+class Solution(object):
+    def equationsPossible(self, equations):
+        """
+        :type equations: List[str]
+        :rtype: bool
+        """
+        #union find
+        parent = [i for i in range(26)]
+        rank = [1] * 26
+        hashset= set()
+        
+        #def find:
+        def find(x):
+            if parent[x] != x:
+                return find(parent[x])
+            return parent[x]
+        
+        #first loop connext all =='s
+        for i in equations:
+            if i[1] == "=":
+                rooti, rootj = find(ord(i[0]) - ord('a')), find(ord(i[3]) - ord('a'))
+                if rooti != rootj:
+                    if rank[rooti] > rank[rootj]:
+                        rooti, rootj = rootj, rooti
+                    parent[rooti] = rootj
+                    rank[rootj] = rank[rooti] + rank[rootj]
+                hashset.add(i[0])
+                hashset.add(i[3])
+        
+        
+        #second loop check all the != 
+        for i in equations:
+            if i[1] == "!":
+                if i[0] == i[3]:
+                    return False
+                if i[0] not in hashset or i[3] not in hashset:
+                    continue
+                rooti, rootj = find(ord(i[0]) - ord('a')), find(ord(i[3]) - ord('a'))
+                if rooti == rootj:
+                    return False
+        return True
+```
+
+\684. Redundant Connection
+
+Medium
+
+4004303Add to ListShare
+
+In this problem, a tree is an **undirected graph** that is connected and has no cycles.
+
+You are given a graph that started as a tree with `n` nodes labeled from `1` to `n`, with one additional edge added. The added edge has two **different** vertices chosen from `1` to `n`, and was not an edge that already existed. The graph is represented as an array `edges` of length `n` where `edges[i] = [ai, bi]` indicates that there is an edge between nodes `ai` and `bi` in the graph.
+
+Return *an edge that can be removed so that the resulting graph is a tree of* `n` *nodes*. If there are multiple answers, return the answer that occurs last in the input.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/05/02/reduntant1-1-graph.jpg)
+
+```
+Input: edges = [[1,2],[1,3],[2,3]]
+Output: [2,3]
+```
+
+```py
+class Solution(object):
+    def findRedundantConnection(self, edges):
+        """
+        :type edges: List[List[int]]
+        :rtype: List[int]
+        """
+        #union find, if rooti == rootj, res打擂台
+        parent = [i for i in range(len(edges)+1)]
+        rank = [1] * (len(edges)+1)
+        self.res = [0,0]
+        
+        #find
+        def find(x):
+            if parent[x] != x:
+                return find(parent[x])
+            return parent[x]
+        
+        #union
+        def union(i,j):
+            rooti, rootj = find(i), find(j)
+            if rooti == rootj:
+                self.res[0] = i
+                self.res[1] = j
+            if rank[rooti] > rank[rootj]:
+                rooti, rootj = rootj, rooti
+            parent[rooti] = rootj
+            rank[rootj] = rank[rooti] + rank[rootj]
+            return
+        
+        for i,j in edges:
+            union(i, j)
+        return self.res
+```
+
+\128. Longest Consecutive Sequence
+
+Medium
+
+11801503Add to ListShare
+
+Given an unsorted array of integers `nums`, return *the length of the longest consecutive elements sequence.*
+
+You must write an algorithm that runs in `O(n)` time.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [100,4,200,1,3,2]
+Output: 4
+Explanation: The longest consecutive elements sequence is [1, 2, 3, 4]. Therefore its length is 4.
+```
+
+```py
+class Solution(object):
+    def longestConsecutive(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        #union find but instead of parent[] use hashmap
+        if len(nums) == 0:
+            return 0
+        self.res = 1
+        parent = {}
+        rank = {}
+        for i in nums:
+            parent[i] = i
+            rank[i] = 1
+        hashset = set()
+        
+        def find(x):
+            if parent[x] != x:
+                return find(parent[x])
+            return parent[x]
+        
+        #when updating rank, update res
+        def union(i, j):
+            rooti, rootj = find(i), find(j)
+            if rank[rooti] > rank[rootj]:
+                rooti, rootj = rootj, rooti
+            parent[rooti] = rootj
+            rank[rootj] = rank[rooti] + rank[rootj]
+            self.res = max(self.res, rank[rootj])
+            return
+            
+        for i in nums:
+            if i not in hashset:
+                hashset.add(i)
+                if i-1 in hashset:
+                    union(i, i-1)
+                if i+1 in hashset:
+                    union(i, i+1)
+                    
+        return self.res
+```
+
+\952. Largest Component Size by Common Factor
+
+Hard
+
+131186Add to ListShare
+
+You are given an integer array of unique positive integers `nums`. Consider the following graph:
+
+- There are `nums.length` nodes, labeled `nums[0]` to `nums[nums.length - 1]`,
+- There is an undirected edge between `nums[i]` and `nums[j]` if `nums[i]` and `nums[j]` share a common factor greater than `1`.
+
+Return *the size of the largest connected component in the graph*.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2018/12/01/ex1.png)
+
+```
+Input: nums = [4,6,15,35]
+Output: 4
+```
+
+```py
+class Solution(object):
+    def largestComponentSize(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        #union find:
+        self.res = 1
+        rank = {}
+        hashmap = collections.defaultdict(list)
+        parent = {}
+        
+        
+        def find(x):
+            if parent[x] != x:
+                return find(parent[x])
+            return parent[x]
+        
+        def union(i, j):
+            rooti, rootj = find(i), find(j)
+            if rooti == rootj:
+                return
+            if rank[rooti] > rank[rootj]:
+                rooti, rootj = rootj, rooti
+            parent[rooti] = rootj
+            rank[rootj] = rank[rooti] + rank[rootj]
+            self.res = max(self.res, rank[rootj]) 
+             
+            
+        def find_set(x):
+            for i in range(2, int(math.sqrt(x)) + 1):
+                if x % i == 0:
+                    return find_set(x//i) | set([i])
+            return set([x])
+            
+            
+        #first put all elements in nums in map associated with prime factor as key
+        for i in nums:
+            rank[i] = 1
+            parent[i] = i
+            set_prime = find_set(i)
+            for j in set_prime:
+                hashmap[j].append(i)
+        
+        #second connect all the elements in each key, while updating rank
+        temp = -1
+        for _, num in hashmap.items():
+            for i in num:
+                if temp == -1:
+                    temp = i
+                union(temp, i)
+                temp = i
+            temp = -1
+        
+        #return highest rank 
+        return self.res
+```
 
 
 

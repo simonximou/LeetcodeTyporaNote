@@ -552,24 +552,29 @@ The last element output[4] is null, but its string representation as a ListNode 
 
 <img src="https://camo.githubusercontent.com/05f375896b965b6c1b2ead25c838b5b3385d18a112878d8e9d3dabacaf2cce8f/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303231303231393139303830393435312e706e67" alt="img" style="zoom:50%;" />
 
+#### Intro
 
+1. ⼆叉树算法设计的总路线：把当前节点要做的事做好，其他的交给递归 框架，不⽤当前节点操⼼。
+
+2. 如果当前节点会对下⾯的⼦节点有整体影响，可以通过辅助函数增⻓参 数列表，借助参数传递信息。 
+
+3. 在⼆叉树框架之上，扩展出⼀套 BST 遍历框架：
+
+   ```java
+   oid BST(TreeNode root, int target) {
+       if (root.val == target)
+       	// 找到⽬标，做点什么
+       if (root.val < target)
+       	BST(root.right, target);
+       if (root.val > target)
+       	BST(root.left, target);
+   }
+   
+   ```
+
+   
 
 #### 遍历
-
-简单
-
-- [145. 二叉树的后序遍历]
-- [94. 二叉树的中序遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal/)
-- [589. N 叉树的前序遍历](https://leetcode-cn.com/problems/n-ary-tree-preorder-traversal/)
-- [144. 二叉树的前序遍历](https://leetcode-cn.com/problems/binary-tree-preorder-traversal/)
-- [590. N 叉树的后序遍历](https://leetcode-cn.com/problems/n-ary-tree-postorder-traversal/)
-- 
-
-中等
-
-- [102. 二叉树的层序遍历](https://leetcode-cn.com/problems/binary-tree-level-order-traversal/)
-- [103. 二叉树的锯齿形层序遍历](https://leetcode-cn.com/problems/binary-tree-zigzag-level-order-traversal/)
-- [107. 二叉树的层序遍历 II](https://leetcode-cn.com/problems/binary-tree-level-order-traversal-ii/)
 
 94. **Binary Tree Inorder Traversal**
 
@@ -1279,18 +1284,7 @@ class Solution(object):
 
 #### 二叉搜索树
 
-简单
-
-- [108. 将有序数组转换为二叉搜索树](https://leetcode-cn.com/problems/convert-sorted-array-to-binary-search-tree/)
-
-中等
-
-- [98. 验证二叉搜索树](https://leetcode-cn.com/problems/validate-binary-search-tree/)
-- [96. 不同的二叉搜索树](https://leetcode-cn.com/problems/unique-binary-search-trees/)
-- [95. 不同的二叉搜索树 II](https://leetcode-cn.com/problems/unique-binary-search-trees-ii/)
-- [173. 二叉搜索树迭代器](https://leetcode-cn.com/problems/binary-search-tree-iterator/)
-- [230. 二叉搜索树中第 K 小的元素](https://leetcode-cn.com/problems/kth-smallest-element-in-a-bst/)
-- [99. 恢复二叉搜索树](https://leetcode-cn.com/problems/recover-binary-search-tree/)
+- https://leetcode-cn.com/problems/recover-binary-search-tree/)
 
 \669. Trim a Binary Search Tree
 
@@ -6469,13 +6463,15 @@ class Solution(object):
         
 ```
 
+### LRU:
+
+#### intro
+
+![image-20220714183257068](C:\Users\zx616\AppData\Roaming\Typora\typora-user-images\image-20220714183257068.png)
 
 
 
-
-
-
-
+![image-20220714183307436](C:\Users\zx616\AppData\Roaming\Typora\typora-user-images\image-20220714183307436.png)
 
 
 

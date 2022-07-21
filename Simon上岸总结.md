@@ -5235,6 +5235,8 @@ class Solution(object):
 
 ### Greedy
 
+<img src="https://camo.githubusercontent.com/daa3b49a8d3a274c8e595c01920394f9150f9aca9e96ca312d81b72cac98f0fa/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303231303931373130343331352e706e67" alt="贪心算法大纲" style="zoom:55%;" />
+
 #### 什么是贪心
 
 **贪心的本质是选择每一阶段的局部最优，从而达到全局最优**。
@@ -5255,6 +5257,10 @@ class Solution(object):
 - 找出适合的贪心策略
 - 求解每一个子问题的最优解
 - 将局部最优解堆叠成全局最优解
+
+#### Knapsack problem
+
+#### 序列问题
 
 **455. Assign Cookies**
 
@@ -5277,6 +5283,8 @@ class Solution:
     def findContentChildren(self, g: List[int], s: List[int]) -> int:
         """
         Greedy, not too sure about the point of this question
+        # 贪心思想1 优先满足需求因子较小的孩子。因为如果较小需求的孩子无法被满足，则之后的较大的需求		更不可能能被满足了。
+		#贪心思想2 尽量用较小的糖果去优先满足孩子。
         """
         g = sorted(g)
         s = sorted(s)
@@ -5287,6 +5295,99 @@ class Solution:
                 pointer += 1
         return res
                 
+```
+
+\1005. Maximize Sum Of Array After K Negations
+
+Easy
+
+104982Add to ListShare
+
+Given an integer array `nums` and an integer `k`, modify the array in the following way:
+
+- choose an index `i` and replace `nums[i]` with `-nums[i]`.
+
+You should apply this process exactly `k` times. You may choose the same index `i` multiple times.
+
+Return *the largest possible sum of the array after modifying it in this way*.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [4,2,3], k = 1
+Output: 5
+Explanation: Choose index 1 and nums becomes [4,-2,3].
+```
+
+```py
+class Solution(object):
+    def largestSumAfterKNegations(self, nums, k):
+        """
+        greedy, changing from lowerst: if less than 0 change it,
+        else: if k even return, if odd change then return
+        """
+        nums = sorted(nums)
+        i = 0
+        while(k > 0 and i<len(nums) and nums[i] < 0):
+            nums[i] = -nums[i]
+            i+=1
+            k-=1
+        if k%2 != 0:
+            return sum(nums) - min(nums)*2
+        return sum(nums)
+        
+```
+
+\860. Lemonade Change
+
+Easy
+
+1320126Add to ListShare
+
+At a lemonade stand, each lemonade costs `$5`. Customers are standing in a queue to buy from you and order one at a time (in the order specified by bills). Each customer will only buy one lemonade and pay with either a `$5`, `$10`, or `$20` bill. You must provide the correct change to each customer so that the net transaction is that the customer pays `$5`.
+
+Note that you do not have any change in hand at first.
+
+Given an integer array `bills` where `bills[i]` is the bill the `ith` customer pays, return `true` *if you can provide every customer with the correct change, or* `false` *otherwise*.
+
+ 
+
+**Example 1:**
+
+```
+Input: bills = [5,5,5,10,20]
+Output: true
+Explanation: 
+From the first 3 customers, we collect three $5 bills in order.
+From the fourth customer, we collect a $10 bill and give back a $5.
+From the fifth customer, we give a $10 bill and a $5 bill.
+Since all customers got correct change, we output true.
+```
+
+```py
+class Solution(object):
+    def lemonadeChange(self, bills):
+        """
+        :type bills: List[int]
+        :rtype: bool
+        """
+        five = ten = 0
+        for num in bills:
+            if num == 5:
+                five += 1
+            elif num == 10 and five:
+                ten += 1
+                five -= 1
+            elif num == 20 and five and ten:
+                five -= 1
+                ten -= 1
+            elif num == 20 and five >= 3:
+                five -= 3
+            else:
+                return False
+        return True
 ```
 
 
@@ -5335,6 +5436,48 @@ class Solution:
             
         
 ```
+
+\738. Monotone Increasing Digits
+
+Medium
+
+96887Add to ListShare
+
+An integer has **monotone increasing digits** if and only if each pair of adjacent digits `x` and `y` satisfy `x <= y`.
+
+Given an integer `n`, return *the largest number that is less than or equal to* `n` *with **monotone increasing digits***.
+
+ 
+
+**Example 1:**
+
+```
+Input: n = 10
+Output: 9
+```
+
+```py
+class Solution(object):
+    def monotoneIncreasingDigits(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        """
+        Greedy, from first to last, if mono increase, copy number, if not
+        down last by one and change cur to 9
+        """
+        n_str = str(n)
+        len_n = len(n_str)
+        for i in range(len_n-1, 0, -1):
+            if int(n_str[i]) < int(n_str[i - 1]):
+                n_str = str(int(n_str) - (int(n_str[i:]) + 1))
+        return int(n_str)
+```
+
+#### 股票问题
+
+
 
 **53. Maximum Subarray**
 
@@ -5404,6 +5547,157 @@ class Solution:
         return res
 ```
 
+\714. Best Time to Buy and Sell Stock with Transaction Fee
+
+Medium
+
+4266109Add to ListShare
+
+You are given an array `prices` where `prices[i]` is the price of a given stock on the `ith` day, and an integer `fee` representing a transaction fee.
+
+Find the maximum profit you can achieve. You may complete as many transactions as you like, but you need to pay the transaction fee for each transaction.
+
+**Note:** You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+
+ 
+
+**Example 1:**
+
+```
+Input: prices = [1,3,2,8,4,9], fee = 2
+Output: 8
+Explanation: The maximum profit can be achieved by:
+- Buying at prices[0] = 1
+- Selling at prices[3] = 8
+- Buying at prices[4] = 4
+- Selling at prices[5] = 9
+The total profit is ((8 - 1) - 2) + ((9 - 4) - 2) = 8.
+```
+
+```py
+class Solution(object):
+    def maxProfit(self, prices, fee):
+        """
+        :type prices: List[int]
+        :type fee: int
+        :rtype: int
+        """
+        """
+        Greedy, if find a lower low, change low, if can make a profitable trade, then 
+        sell and change low to tradevalue-fee because for [1,4, 10,14], 14-4-2is what we will miss
+        """
+        n = len(prices)
+        if n < 2:
+             return 0
+        ans = 0
+        minimum = prices[0]
+        for i in range(1, n):
+            if prices[i] < minimum:
+                minimum = prices[i]
+            elif prices[i] > minimum + fee:
+                ans += prices[i] - fee - minimum
+                minimum = prices[i] - fee
+        return ans
+        
+```
+
+#### 2D
+
+\135. Candy
+
+Hard
+
+4452309Add to ListShare
+
+There are `n` children standing in a line. Each child is assigned a rating value given in the integer array `ratings`.
+
+You are giving candies to these children subjected to the following requirements:
+
+- Each child must have at least one candy.
+- Children with a higher rating get more candies than their neighbors.
+
+Return *the minimum number of candies you need to have to distribute the candies to the children*.
+
+ 
+
+**Example 1:**
+
+```
+Input: ratings = [1,0,2]
+Output: 5
+Explanation: You can allocate to the first, second and third child with 2, 1, 2 candies respectively.
+```
+
+```py
+class Solution(object):
+    def candy(self, ratings):
+        """
+        :type ratings: List[int]
+        :rtype: int
+        """
+        [1,2,3,1,3,2,1]
+        #brute force: if larger add, if lower and less than 0 change all prev
+        #O(2n): two array, one round from left and one round from right, take max
+        #O(n): one round from left and one round from right, change in same array
+        n = len(ratings)        
+        res = [1]*n
+        for i in range(1, n):
+            #if larger:
+            if ratings[i] > ratings[i-1]:
+                res[i] = res[i-1]+1
+        for i in range(n-2, -1, -1):
+            if ratings[i] > ratings[i+1]:
+                res[i] = max(res[i+1]+1, res[i])
+        return sum(res)
+```
+
+\406. Queue Reconstruction by Height
+
+Medium
+
+6251637Add to ListShare
+
+You are given an array of people, `people`, which are the attributes of some people in a queue (not necessarily in order). Each `people[i] = [hi, ki]` represents the `ith` person of height `hi` with **exactly** `ki` other people in front who have a height greater than or equal to `hi`.
+
+Reconstruct and return *the queue that is represented by the input array* `people`. The returned queue should be formatted as an array `queue`, where `queue[j] = [hj, kj]` is the attributes of the `jth` person in the queue (`queue[0]` is the person at the front of the queue).
+
+ 
+
+**Example 1:**
+
+```
+Input: people = [[7,0],[4,4],[7,1],[5,0],[6,1],[5,2]]
+Output: [[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]]
+Explanation:
+Person 0 has height 5 with no other people taller or the same height in front.
+Person 1 has height 7 with no other people taller or the same height in front.
+Person 2 has height 5 with two persons taller or the same height in front, which is person 0 and 1.
+Person 3 has height 6 with one person taller or the same height in front, which is person 1.
+Person 4 has height 4 with four people taller or the same height in front, which are people 0, 1, 2, and 3.
+Person 5 has height 7 with one person taller or the same height in front, which is person 1.
+Hence [[5,0],[7,0],[5,2],[6,1],[4,4],[7,1]] is the reconstructed queue.
+```
+
+```py
+class Solution(object):
+    def reconstructQueue(self, people):
+        """
+        :type people: List[List[int]]
+        :rtype: List[List[int]]
+        """
+        """
+        Greedy, first sort people in h and then in k, insert higher first and then
+        insert lower accourding to their k and res[k] will be their position
+        """
+        people.sort(key = lambda x: (-x[0], x[1]))
+        output = []
+        for p in people:
+            output.insert(p[1], p)
+        return output
+```
+
+#### 区间问题
+
 **55. Jump Game**
 
 You are given an integer array `nums`. You are initially positioned at the array's **first index**, and each element in the array represents your maximum jump length at that position.
@@ -5430,6 +5724,20 @@ class Solution:
             if covered >= len(nums) - 1:
                 return True
             i += 1
+        return False
+    
+    	######
+        
+        if len(nums) == 1:
+            return True
+        step = 0
+        maxStep = 0
+        while step<len(nums) and maxStep >= step:
+            
+            maxStep = max(maxStep, step + nums[step])
+            step += 1
+        if step-1 >= len(nums)-1:
+            return True
         return False
 ```
 
@@ -5467,6 +5775,250 @@ class Solution:
         return jump 
             
 ```
+
+\452. Minimum Number of Arrows to Burst Balloons
+
+Medium
+
+3595105Add to ListShare
+
+There are some spherical balloons taped onto a flat wall that represents the XY-plane. The balloons are represented as a 2D integer array `points` where `points[i] = [xstart, xend]` denotes a balloon whose **horizontal diameter** stretches between `xstart` and `xend`. You do not know the exact y-coordinates of the balloons.
+
+Arrows can be shot up **directly vertically** (in the positive y-direction) from different points along the x-axis. A balloon with `xstart` and `xend` is **burst** by an arrow shot at `x` if `xstart <= x <= xend`. There is **no limit** to the number of arrows that can be shot. A shot arrow keeps traveling up infinitely, bursting any balloons in its path.
+
+Given the array `points`, return *the **minimum** number of arrows that must be shot to burst all balloons*.
+
+ 
+
+**Example 1:**
+
+```
+Input: points = [[10,16],[2,8],[1,6],[7,12]]
+Output: 2
+Explanation: The balloons can be burst by 2 arrows:
+- Shoot an arrow at x = 6, bursting the balloons [2,8] and [1,6].
+- Shoot an arrow at x = 11, bursting the balloons [10,16] and [7,12].
+```
+
+```py
+class Solution(object):
+    def findMinArrowShots(self, points):
+        """
+        :type points: List[List[int]]
+        :rtype: int
+        """
+        """
+        Greedy: sort list using first index, then check arr1[1] with arr2[0],
+        if larger, then is contained in the same arrow, if smaller, update to the smallest width
+        """
+        n = len(points)
+        arrow = 1
+        points = sorted(points)
+        i = 0
+        for i in range(1,n):
+            if points[i][0] > points[i-1][1]:
+                arrow += 1
+            else:
+                points[i][1] = min(points[i - 1][1], points[i][1])
+        return arrow
+```
+
+\435. Non-overlapping Intervals
+
+Medium
+
+4363130Add to ListShare
+
+Given an array of intervals `intervals` where `intervals[i] = [starti, endi]`, return *the minimum number of intervals you need to remove to make the rest of the intervals non-overlapping*.
+
+ 
+
+**Example 1:**
+
+```
+Input: intervals = [[1,2],[2,3],[3,4],[1,3]]
+Output: 1
+Explanation: [1,3] can be removed and the rest of the intervals are non-overlapping.
+```
+
+```py
+class Solution(object):
+    def eraseOverlapIntervals(self, intervals):
+        """
+        :type intervals: List[List[int]]
+        :rtype: int
+        """
+        """
+        难点一：一看题就有感觉需要排序，但究竟怎么排序，按左边界排还是右边界排。
+        难点二：排完序之后如何遍历，如果没有分析好遍历顺序，那么排序就没有意义了。
+        难点三：直接求重复的区间是复杂的，转而求最大非重复区间个数。
+        难点四：求最大非重复区间个数时，需要一个分割点来做标记
+        右边界排序之后，局部最优：优先选右边界小的区间，所以从左向右遍历，留给下一个区间的空          间大一些，从而尽量避免交叉。全局最优：选取最多的非交叉区间。
+        """
+        intervals = sorted(intervals, key = lambda x: x[1])
+        count = 1
+        end = intervals[0][1]
+        for i in range(1, len(intervals)):
+            if intervals[i][0] >= end:
+                count += 1
+                end = intervals[i][1]
+        return len(intervals) - count 
+```
+
+\763. Partition Labels
+
+Medium
+
+8036305Add to ListShare
+
+You are given a string `s`. We want to partition the string into as many parts as possible so that each letter appears in at most one part.
+
+Note that the partition is done so that after concatenating all the parts in order, the resultant string should be `s`.
+
+Return *a list of integers representing the size of these parts*.
+
+ 
+
+**Example 1:**
+
+```
+Input: s = "ababcbacadefegdehijhklij"
+Output: [9,7,8]
+Explanation:
+The partition is "ababcbaca", "defegde", "hijhklij".
+This is a partition so that each letter appears in at most one part.
+A partition like "ababcbacadefegde", "hijhklij" is incorrect, because it splits s into less parts.
+```
+
+```py
+class Solution(object):
+    def partitionLabels(self, s):
+        """
+        :type s: str
+        :rtype: List[int]
+        """
+        #first construct hashmap so we know the last of each number 
+        hashmap = [0] * 26
+        res = []
+        for i in range(len(s)):
+            hashmap[ord(s[i])-ord("a")] = i
+
+        #loop and update the end index, if index == end, append index
+        end = start = 0
+        for i in range(len(s)):
+            end = max(end, hashmap[ord(s[i])-ord("a")])
+            if end == i:
+                res.append(end-start+1)
+                start = end+1
+        
+        return res
+
+```
+
+\56. Merge Intervals
+
+Medium
+
+14847548Add to ListShare
+
+Given an array of `intervals` where `intervals[i] = [starti, endi]`, merge all overlapping intervals, and return *an array of the non-overlapping intervals that cover all the intervals in the input*.
+
+ 
+
+**Example 1:**
+
+```
+Input: intervals = [[1,3],[2,6],[8,10],[15,18]]
+Output: [[1,6],[8,10],[15,18]]
+Explanation: Since intervals [1,3] and [2,6] overlap, merge them into [1,6].
+```
+
+```py
+class Solution(object):
+    def merge(self, intervals):
+        """
+        :type intervals: List[List[int]]
+        :rtype: List[List[int]]
+        """
+        res = []
+        intervals = sorted(intervals)
+        for i in range(1, len(intervals)):
+            if intervals[i][0] <= intervals[i-1][1]:
+                intervals[i][0] = intervals[i-1][0]
+                intervals[i][1] = max(intervals[i][1], intervals[i-1][1])
+            else:
+                res.append(intervals[i-1])
+        res.append(intervals[-1])
+        return res
+```
+
+#### Hard
+
+\134. Gas Station
+
+Medium
+
+6365634Add to ListShare
+
+There are `n` gas stations along a circular route, where the amount of gas at the `ith` station is `gas[i]`.
+
+You have a car with an unlimited gas tank and it costs `cost[i]` of gas to travel from the `ith` station to its next `(i + 1)th` station. You begin the journey with an empty tank at one of the gas stations.
+
+Given two integer arrays `gas` and `cost`, return *the starting gas station's index if you can travel around the circuit once in the clockwise direction, otherwise return* `-1`. If there exists a solution, it is **guaranteed** to be **unique**
+
+ 
+
+**Example 1:**
+
+```
+Input: gas = [1,2,3,4,5], cost = [3,4,5,1,2]
+Output: 3
+Explanation:
+Start at station 3 (index 3) and fill up with 4 unit of gas. Your tank = 0 + 4 = 4
+Travel to station 4. Your tank = 4 - 1 + 5 = 8
+Travel to station 0. Your tank = 8 - 2 + 1 = 7
+Travel to station 1. Your tank = 7 - 3 + 2 = 6
+Travel to station 2. Your tank = 6 - 4 + 3 = 5
+Travel to station 3. The cost is 5. Your gas is just enough to travel back to station 3.
+Therefore, return 3 as the starting index.
+```
+
+```py
+class Solution(object):
+    def canCompleteCircuit(self, gas, cost):
+        """
+        :type gas: List[int]
+        :type cost: List[int]
+        :rtype: int
+        """
+        """
+        首先如果总油量减去总消耗大于等于零那么一定可以跑完一圈，说明 各个站点的加油站 剩油量rest[i]相加一定是大于等于零的。
+
+每个加油站的剩余量rest[i]为gas[i] - cost[i]。
+
+i从0开始累加rest[i]，和记为curSum，一旦curSum小于零，说明[0, i]区间都不能作为起始位置，起始位置从i+1算起，再从0计算curSum。
+        """
+        curSum = totalSum = start = 0
+        for i in range(len(gas)):
+            curSum += gas[i] - cost[i]
+            totalSum += gas[i] - cost[i]
+            if curSum < 0:
+                curSum = 0
+                start = i+1
+        if totalSum < 0:
+            return -1
+        return start
+```
+
+
+
+
+
+
+
+
+
+
 
 ### Union Find
 
@@ -6472,6 +7024,279 @@ class Solution(object):
 
 
 ![image-20220714183307436](C:\Users\zx616\AppData\Roaming\Typora\typora-user-images\image-20220714183307436.png)
+
+### DP
+
+#### DP解题过程
+
+**对于动态规划问题，我将拆解为如下五步曲，这五步都搞清楚了，才能说把动态规划真的掌握了！**
+
+1. 确定dp数组（dp table）以及下标的含义
+2. 确定递推公式
+3. dp数组如何初始化
+4. 确定遍历顺序
+5. 举例推导dp数组
+
+**因为一些情况是递推公式决定了dp数组要如何初始化！**
+
+后面的讲解中我都是围绕着这五点来进行讲解。
+
+可能刷过动态规划题目的同学可能都知道递推公式的重要性，感觉确定了递推公式这道题目就解出来了。
+
+其实 确定递推公式 仅仅是解题里的一步而已！
+
+一些同学知道递推公式，但搞不清楚dp数组应该如何初始化，或者正确的遍历顺序，以至于记下来公式，但写的程序怎么改都通过不了。
+
+#### Easy
+
+\70. Climbing Stairs
+
+Easy
+
+13089391Add to ListShare
+
+You are climbing a staircase. It takes `n` steps to reach the top.
+
+Each time you can either climb `1` or `2` steps. In how many distinct ways can you climb to the top?
+
+ 
+
+**Example 1:**
+
+```
+Input: n = 2
+Output: 2
+Explanation: There are two ways to climb to the top.
+1. 1 step + 1 step
+2. 2 steps
+```
+
+```py
+class Solution(object):
+    def climbStairs(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        """
+        Dp推导公式 dp[i] = dp[i-1] + dp[i-2]
+        """
+        if n <= 2:
+            return n
+        dp = [0]*(n+1)
+        dp[1] = 1
+        dp[2] = 2
+        for i in range(3, n+1):
+            dp[i] = dp[i-2] + dp[i-1]
+        return dp[n]
+```
+
+\746. Min Cost Climbing Stairs
+
+Easy
+
+72331175Add to ListShare
+
+You are given an integer array `cost` where `cost[i]` is the cost of `ith` step on a staircase. Once you pay the cost, you can either climb one or two steps.
+
+You can either start from the step with index `0`, or the step with index `1`.
+
+Return *the minimum cost to reach the top of the floor*.
+
+ 
+
+**Example 1:**
+
+```
+Input: cost = [10,15,20]
+Output: 15
+Explanation: You will start at index 1.
+- Pay 15 and climb two steps to reach the top.
+The total cost is 15.
+```
+
+```py
+class Solution(object):
+    def minCostClimbingStairs(self, cost):
+        """
+        :type cost: List[int]
+        :rtype: int
+        """
+        """
+        就是要不是第一步不花费，要不是最后一步不花费
+        """
+        n = len(cost)
+        dp = [0]*(n+1)
+        for i in range(2,n+1):
+            dp[i] = min(dp[i-1]+cost[i-1], dp[i-2]+cost[i-2])
+        return dp[n]
+```
+
+\62. Unique Paths
+
+Medium
+
+9906314Add to ListShare
+
+There is a robot on an `m x n` grid. The robot is initially located at the **top-left corner** (i.e., `grid[0][0]`). The robot tries to move to the **bottom-right corner** (i.e., `grid[m - 1][n - 1]`). The robot can only move either down or right at any point in time.
+
+Given the two integers `m` and `n`, return *the number of possible unique paths that the robot can take to reach the bottom-right corner*.
+
+The test cases are generated so that the answer will be less than or equal to `2 * 109`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2018/10/22/robot_maze.png)
+
+```
+Input: m = 3, n = 7
+Output: 28
+```
+
+```py
+class Solution(object):
+    def uniquePaths(self, m, n):
+        """
+        2d DP 
+        """
+        dp = [[0]*n]*m
+        for i in range(m):
+            for j in range(n):
+                if i == 0:
+                    dp[0][j] = 1
+                elif j == 0:
+                    dp[i][0] = 1
+                else:
+                    dp[i][j] = dp[i-1][j] + dp[i][j-1]
+        return dp[m-1][n-1]
+```
+
+\63. Unique Paths II
+
+Medium
+
+5550398Add to ListShare
+
+You are given an `m x n` integer array `grid`. There is a robot initially located at the **top-left corner** (i.e., `grid[0][0]`). The robot tries to move to the **bottom-right corner** (i.e., `grid[m-1][n-1]`). The robot can only move either down or right at any point in time.
+
+An obstacle and space are marked as `1` or `0` respectively in `grid`. A path that the robot takes cannot include **any** square that is an obstacle.
+
+Return *the number of possible unique paths that the robot can take to reach the bottom-right corner*.
+
+The testcases are generated so that the answer will be less than or equal to `2 * 109`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/11/04/robot1.jpg)
+
+```
+Input: obstacleGrid = [[0,0,0],[0,1,0],[0,0,0]]
+Output: 2
+Explanation: There is one obstacle in the middle of the 3x3 grid above.
+There are two ways to reach the bottom-right corner:
+1. Right -> Right -> Down -> Down
+2. Down -> Down -> Right -> Right
+```
+
+```py
+class Solution(object):
+    def uniquePathsWithObstacles(self, obstacleGrid):
+        """
+        :type obstacleGrid: List[List[int]]
+        :rtype: int
+        
+        2D DP: if obstacke, change to -1
+        while dp: if find -1, dont include 
+        
+        """
+        row,col = len(obstacleGrid), len(obstacleGrid[0])
+        dp = [[0 for _ in range(col)] for _ in range(row)]
+        #initialize dp, first row+col
+        for i in range(len(obstacleGrid)):
+            if obstacleGrid[i][0] == 1:
+                break
+            else:
+                dp[i][0] = 1
+        for j in range(len(obstacleGrid[0])):
+            if obstacleGrid[0][j] == 1:
+                break
+            else:
+                dp[0][j] = 1
+        #DP      
+        for i in range(1,row):
+            for j in range(1,col):
+                if obstacleGrid[i][j] == 1:
+                    dp[i][j] = 0
+                    continue
+                else:
+                    dp[i][j] = dp[i-1][j] + dp[i][j-1]
+        return dp[row-1][col-1]
+                    
+```
+
+\343. Integer Break
+
+Medium
+
+2971339Add to ListShare
+
+Given an integer `n`, break it into the sum of `k` **positive integers**, where `k >= 2`, and maximize the product of those integers.
+
+Return *the maximum product you can get*.
+
+ 
+
+**Example 1:**
+
+```
+Input: n = 2
+Output: 1
+Explanation: 2 = 1 + 1, 1 × 1 = 1.
+```
+
+```py
+class Solution(object):
+    def integerBreak(self, n):
+        """
+        :type n: int
+        :rtype: int
+        dp, for each find the max of each combo or past combo
+        
+        """
+        dp = [0 for _ in range(n+1)]
+        dp[2] = 1
+        for i in range(3, n+1):
+            for j in range(1, i-1):
+                dp[i] = max(dp[i], max(j*(i-j), j*(dp[i-j])))
+        return dp[n]
+        
+```
+
+#### 01背包问题
+
+![416.分割等和子集1](https://camo.githubusercontent.com/5c5af3f54a3503cdb989ab1c28e2933202a33259608c70af0e72db5a858f14e6/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303231303131373137313330373430372e706e67)
+
+##### 二维dp数组01背包
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

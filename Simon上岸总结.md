@@ -7282,15 +7282,237 @@ class Solution(object):
 
 ##### 二维dp数组01背包
 
+<img src="https://camo.githubusercontent.com/76247d4a17bf2cb456d9e4ecce19800bd6524cd23d56ba42ad41841f878da6fc/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303231303131303130333030333336312e706e67" alt="动态规划-背包问题1" style="zoom:50%;" />
 
+1. 确定递推公式
 
+再回顾一下dp[i][j]的含义：从下标为[0-i]的物品里任意取，放进容量为j的背包，价值总和最大是多少。
 
+那么可以有两个方向推出来dp[i][j]，
 
+- **不放物品i**：由dp[i - 1][j]推出，即背包容量为j，里面不放物品i的最大价值，此时dp[i][j]就是dp[i - 1][j]。(其实就是当物品i的重量大于背包j的重量时，物品i无法放进背包中，所以被背包内的价值依然和前面相同。)
+- **放物品i**：由dp[i - 1][j - weight[i]]推出，dp[i - 1][j - weight[i]] 为背包容量为j - weight[i]的时候不放物品i的最大价值，那么dp[i - 1][j - weight[i]] + value[i] （物品i的价值），就是背包放物品i得到的最大价值
 
+所以递归公式：
 
+```py
+ dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - weight[i]] + value[i]);
+```
 
+2. dp数组如何初始化
 
+**关于初始化，一定要和dp数组的定义吻合，否则到递推公式的时候就会越来越乱**。
 
+首先从dp[i][j]的定义出发，如果背包容量j为0的话，即dp[i][0]，无论是选取哪些物品，背包价值总和一定为0。如图：
+
+在看其他![动态规划-背包问题10](https://camo.githubusercontent.com/c3fce313bc37ddf8c0c3883d8eb9496fdaf32ea1970e36703f97bfa65be4bf4b/68747470733a2f2f636f64652d7468696e6b696e672e63646e2e626365626f732e636f6d2f706963732f2545352538412541382545362538302538312545382541372538342545352538382539322d25453825383325384325453525384325383525453925393725414525453925413225393831302e6a7067)情况。
+
+状态转移方程 dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - weight[i]] + value[i]); 可以看出i 是由 i-1 推导出来，那么i为0的时候就一定要初始化。
+
+dp[0][j]，即：i为0，存放编号0的物品的时候，各个容量的背包所能存放的最大价值。
+
+那么很明显当 j < weight[0]的时候，dp[0][j] 应该是 0，因为背包容量比编号0的物品重量还小。
+
+当j >= weight[0]时，dp[0][j] 应该是value[0]，因为背包容量放足够放编号0物品。
+
+代码初始化如下：
+
+```
+for (int j = 0 ; j < weight[0]; j++) {  // 当然这一步，如果把dp数组预先初始化为0了，这一步就可以省略，但很多同学应该没有想清楚这一点。
+    dp[0][j] = 0;
+}
+// 正序遍历
+for (int j = weight[0]; j <= bagweight; j++) {
+    dp[0][j] = value[0];
+}
+```
+
+那么问题来了，**先遍历 物品还是先遍历背包重量呢？**
+
+**其实都可以！！ 但是先遍历物品更好理解**。
+
+那么我先给出先遍历物品，然后遍历背包重量的代码。
+
+```
+// weight数组的大小 就是物品个数
+for(int i = 1; i < weight.size(); i++) { // 遍历物品
+    for(int j = 0; j <= bagweight; j++) { // 遍历背包容量
+        if (j < weight[i]) dp[i][j] = dp[i - 1][j]; 
+        else dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - weight[i]] + value[i]);
+
+    }
+}
+```
+
+**先遍历背包，再遍历物品，也是可以的！（注意我这里使用的二维dp数组）**
+
+例如这样：
+
+```
+// weight数组的大小 就是物品个数
+for(int j = 0; j <= bagweight; j++) { // 遍历背包容量
+    for(int i = 1; i < weight.size(); i++) { // 遍历物品
+        if (j < weight[i]) dp[i][j] = dp[i - 1][j];
+        else dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - weight[i]] + value[i]);
+    }
+}
+```
+
+##### 一维dp数组（滚动数组）
+
+对于背包问题其实状态都是可以压缩的。
+
+在使用二维数组的时候，递推公式：dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - weight[i]] + value[i]);
+
+**其实可以发现如果把dp[i - 1]那一层拷贝到dp[i]上，表达式完全可以是：dp[i][j] = max(dp[i][j], dp[i][j - weight[i]] + value[i]);**
+
+**与其把dp[i - 1]这一层拷贝到dp[i]上，不如只用一个一维数组了**，只用dp[j]（一维数组，也可以理解是一个滚动数组）。
+
+1. 确定dp数组的定义
+
+在一维dp数组中，dp[j]表示：容量为j的背包，所背的物品价值可以最大为dp[j]。
+
+1. 一维dp数组的递推公式
+
+dp[j]为 容量为j的背包所背的最大价值，那么如何推导dp[j]呢？
+
+dp[j]可以通过dp[j - weight[i]]推导出来，dp[j - weight[i]]表示容量为j - weight[i]的背包所背的最大价值。
+
+dp[j - weight[i]] + value[i] 表示 容量为 j - 物品i重量 的背包 加上 物品i的价值。（也就是容量为j的背包，放入物品i了之后的价值即：dp[j]）
+
+此时dp[j]有两个选择，一个是取自己dp[j] 相当于 二维dp数组中的dp[i-1][j]，即不放物品i，一个是取dp[j - weight[i]] + value[i]，即放物品i，指定是取最大的，毕竟是求最大价值，
+
+所以递归公式为：
+
+```
+dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+```
+
+可以看出相对于二维dp数组的写法，就是把dp[i][j]中i的维度去掉了。
+
+1. 一维dp数组如何初始化
+
+**关于初始化，一定要和dp数组的定义吻合，否则到递推公式的时候就会越来越乱**。
+
+dp[j]表示：容量为j的背包，所背的物品价值可以最大为dp[j]，那么dp[0]就应该是0，因为背包容量为0所背的物品的最大价值就是0。
+
+那么dp数组除了下标0的位置，初始为0，其他下标应该初始化多少呢？
+
+看一下递归公式：dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+
+dp数组在推导的时候一定是取价值最大的数，如果题目给的价值都是正整数那么非0下标都初始化为0就可以了。
+
+**这样才能让dp数组在递归公式的过程中取的最大的价值，而不是被初始值覆盖了**。
+
+那么我假设物品价值都是大于0的，所以dp数组初始化的时候，都初始为0就可以了。
+
+1. 一维dp数组遍历顺序
+
+代码如下：
+
+```
+for(int i = 0; i < weight.size(); i++) { // 遍历物品
+    for(int j = bagWeight; j >= weight[i]; j--) { // 遍历背包容量
+        dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+
+    }
+}
+```
+
+**这里大家发现和二维dp的写法中，遍历背包的顺序是不一样的！**
+
+二维dp遍历的时候，背包容量是从小到大，而一维dp遍历的时候，背包是从大到小。
+
+为什么呢？
+
+**倒序遍历是为了保证物品i只被放入一次！**。但如果一旦正序遍历了，那么物品0就会被重复加入多次！
+
+\416. Partition Equal Subset Sum
+
+Medium
+
+8184128Add to ListShare
+
+Given a **non-empty** array `nums` containing **only positive integers**, find if the array can be partitioned into two subsets such that the sum of elements in both subsets is equal.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [1,5,11,5]
+Output: true
+Explanation: The array can be partitioned as [1, 5, 5] and [11].
+```
+
+```py
+class Solution(object):
+    def canPartition(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: bool
+        DP 01backpack  problem: we want to find if any combination can have sum of sum(nums)/2 because that can create two subsets
+        """
+        if sum(nums)%2 == 1:
+            return False
+        target = sum(nums)/2
+        dp = [0]*(target+1)
+        for i in range(len(nums)):
+            for j in range(target, nums[i]-1, -1):
+                dp[j] = max(dp[j], dp[j-nums[i]] + nums[i])
+        return dp[target] == target
+```
+
+\1049. Last Stone Weight II
+
+Medium
+
+230177Add to ListShare
+
+You are given an array of integers `stones` where `stones[i]` is the weight of the `ith` stone.
+
+We are playing a game with the stones. On each turn, we choose any two stones and smash them together. Suppose the stones have weights `x` and `y` with `x <= y`. The result of this smash is:
+
+- If `x == y`, both stones are destroyed, and
+- If `x != y`, the stone of weight `x` is destroyed, and the stone of weight `y` has new weight `y - x`.
+
+At the end of the game, there is **at most one** stone left.
+
+Return *the smallest possible weight of the left stone*. If there are no stones left, return `0`.
+
+ 
+
+**Example 1:**
+
+```
+Input: stones = [2,7,4,1,8,1]
+Output: 1
+Explanation:
+We can combine 2 and 4 to get 2, so the array converts to [2,7,1,8,1] then,
+we can combine 7 and 8 to get 1, so the array converts to [2,1,1,1] then,
+we can combine 2 and 1 to get 1, so the array converts to [1,1,1] then,
+we can combine 1 and 1 to get 0, so the array converts to [1], then that's the optimal value.
+```
+
+```py
+class Solution(object):
+    def lastStoneWeightII(self, stones):
+        """
+        :type stones: List[int]
+        :rtype: int
+        First understand the question, we want to find the last stone weight so that
+        involves hitting two stones. A piles of stones can be understood as two simmilar weight stones like 417, so just Use DP 01 backpack to find the left weight
+        
+        """
+        n = sum(stones)
+        target = n/2
+        dp = [0] * (target+1)
+        for i in range(len(stones)):
+            for j in range(target, stones[i]-1, -1):
+                dp[j] = max(dp[j], dp[j-stones[i]]+stones[i])
+        return n - 2*dp[target]
+        
+```
 
 
 

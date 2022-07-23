@@ -7358,6 +7358,12 @@ for(int j = 0; j <= bagweight; j++) { // 遍历背包容量
 }
 ```
 
+**如果求组合数就是外层for循环遍历物品，内层for遍历背包**。
+
+**如果求排列数就是外层for遍历背包，内层for循环遍历物品**。
+
+
+
 ##### 一维dp数组（滚动数组）
 
 对于背包问题其实状态都是可以压缩的。
@@ -7515,6 +7521,320 @@ class Solution(object):
 ```
 
 
+
+求组合类问题的公式，都是类似这种：
+
+```
+dp[j] += dp[j - nums[i]]
+```
+
+\494. Target Sum
+
+Medium
+
+7483274Add to ListShare
+
+You are given an integer array `nums` and an integer `target`.
+
+You want to build an **expression** out of nums by adding one of the symbols `'+'` and `'-'` before each integer in nums and then concatenate all the integers.
+
+- For example, if `nums = [2, 1]`, you can add a `'+'` before `2` and a `'-'` before `1` and concatenate them to build the expression `"+2-1"`.
+
+Return the number of different **expressions** that you can build, which evaluates to `target`.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [1,1,1,1,1], target = 3
+Output: 5
+Explanation: There are 5 ways to assign symbols to make the sum of nums be target 3.
+-1 + 1 + 1 + 1 + 1 = 3
++1 - 1 + 1 + 1 + 1 = 3
++1 + 1 - 1 + 1 + 1 = 3
++1 + 1 + 1 - 1 + 1 = 3
++1 + 1 + 1 + 1 - 1 = 3
+```
+
+```py
+class Solution(object):
+    def findTargetSumWays(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: int
+        每个物品只能用一次！！！！！
+        组合类背包问题 since add to a target, there will be a left and right part wehre:
+        left - right = target, since right = sum - left:
+        left = (target+sum)/2
+        backpack weight = target
+        each item weight = value = nums[i]
+        
+        """
+        sums = sum(nums)
+        n = (sums+target)/2
+        if abs(target) > sums or (sums+target)%2 == 1:
+            return 0
+        dp = [0] * (n+1)
+        dp[0] = 1
+        for i in range(len(nums)):
+            for j in range(n, nums[i]-1, -1):
+                dp[j] += dp[j-nums[i]]
+        return dp[n]
+```
+
+\474. Ones and Zeroes
+
+Medium
+
+4144396Add to ListShare
+
+You are given an array of binary strings `strs` and two integers `m` and `n`.
+
+Return *the size of the largest subset of `strs` such that there are **at most*** `m` `0`*'s and* `n` `1`*'s in the subset*.
+
+A set `x` is a **subset** of a set `y` if all elements of `x` are also elements of `y`.
+
+ 
+
+**Example 1:**
+
+```
+Input: strs = ["10","0001","111001","1","0"], m = 5, n = 3
+Output: 4
+Explanation: The largest subset with at most 5 0's and 3 1's is {"10", "0001", "1", "0"}, so the answer is 4.
+Other valid but smaller subsets include {"0001", "1"} and {"10", "1", "0"}.
+{"111001"} is an invalid subset because it contains 4 1's, greater than the maximum of 3.
+```
+
+```py
+class Solution(object):
+    def findMaxForm(self, strs, m, n):
+        """
+        :type strs: List[str]
+        :type m: int
+        :type n: int
+        :rtype: int
+        
+        看见数组每个element只能用一次加上背包重量直接想到dp01背包问题
+        二位数组用mn做ij
+        dp[i][j] = max(dp[i][j], dp[i-zero][j-one]+1)
+        """
+        dp = [[0]*(m+1) for _ in range(n+1)]
+        for x in strs:
+            zeroCount = x.count("0")
+            oneCount = x.count("1")
+            for i in range(n, oneCount-1, -1):
+                for j in range(m, zeroCount-1, -1):
+                    dp[i][j] = max(dp[i][j], dp[i-oneCount][j-zeroCount]+1)
+        return dp[n][m] 
+
+        
+```
+
+##### 完全背包
+
+我们知道01背包内嵌的循环是从大到小遍历，为了保证每个物品仅被添加一次。
+
+而完全背包的物品是可以添加多次的，所以要从小到大去遍历，即：
+
+```
+// 先遍历物品，再遍历背包
+for(int i = 0; i < weight.size(); i++) { // 遍历物品
+    for(int j = weight[i]; j <= bagWeight ; j++) { // 遍历背包容量
+        dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+
+    }
+}
+```
+
+\518. Coin Change 2
+
+Medium
+
+5644111Add to ListShare
+
+You are given an integer array `coins` representing coins of different denominations and an integer `amount` representing a total amount of money.
+
+Return *the number of combinations that make up that amount*. If that amount of money cannot be made up by any combination of the coins, return `0`.
+
+You may assume that you have an infinite number of each kind of coin.
+
+The answer is **guaranteed** to fit into a signed **32-bit** integer.
+
+ 
+
+**Example 1:**
+
+```
+Input: amount = 5, coins = [1,2,5]
+Output: 4
+Explanation: there are four ways to make up the amount:
+5=5
+5=2+2+1
+5=2+1+1+1
+5=1+1+1+1+1
+```
+
+```py
+class Solution(object):
+    def change(self, amount, coins):
+        """
+        :type amount: int
+        :type coins: List[int]
+        :rtype: int
+        
+        一个array有重量、价值，一个背包，马上想到DP
+        因为每个element可以用无数次，是完全背包问题
+        """
+        dp = [0] * (amount+1)
+        dp[0] = 1
+        for i in range(len(coins)):
+            for j in range(coins[i], amount+1):
+                dp[j] += dp[j-coins[i]]
+        return dp[amount]
+```
+
+\377. Combination Sum IV
+
+Medium
+
+3740423Add to ListShare
+
+Given an array of **distinct** integers `nums` and a target integer `target`, return *the number of possible combinations that add up to* `target`.
+
+The test cases are generated so that the answer can fit in a **32-bit** integer.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [1,2,3], target = 4
+Output: 7
+Explanation:
+The possible combination ways are:
+(1, 1, 1, 1)
+(1, 1, 2)
+(1, 2, 1)
+(1, 3)
+(2, 1, 1)
+(2, 2)
+(3, 1)
+Note that different sequences are counted as different combinations.
+```
+
+```py
+class Solution(object):
+    def combinationSum4(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: int
+        如果求组合数就是外层for循环遍历物品，内层for遍历背包。
+        如果求排列数就是外层for遍历背包，内层for循环遍历物品。
+        target is backpack， n items to put in
+        """
+        dp = [0] * (target + 1)
+        dp[0] = 1
+        for i in range(1, target+1):
+            for j in nums:
+                if i >= j:
+                    dp[i] += dp[i-j]
+        return dp[target]
+```
+
+\322. Coin Change
+
+Medium
+
+12890289Add to ListShare
+
+You are given an integer array `coins` representing coins of different denominations and an integer `amount` representing a total amount of money.
+
+Return *the fewest number of coins that you need to make up that amount*. If that amount of money cannot be made up by any combination of the coins, return `-1`.
+
+You may assume that you have an infinite number of each kind of coin.
+
+ 
+
+**Example 1:**
+
+```
+Input: coins = [1,2,5], amount = 11
+Output: 3
+Explanation: 11 = 5 + 5 + 1
+```
+
+```py
+class Solution(object):
+    def coinChange(self, coins, amount):
+        """
+        :type coins: List[int]
+        :type amount: int
+        :rtype: int
+        each can use infinite time, 完全背包
+        排列问题
+        dp[i] = fewest length to fill i
+        dp[i] = min(dp[i], dp[i-j]+1)
+        [0,1,2,3,4,5]
+        for backpack:
+            for item
+        
+        """
+        dp = [sys.maxint] * (amount+1)
+        dp[0] = 0
+        for i in range(1,amount+1):
+            for j in coins:
+                if i>=j:
+                    dp[i] = min(dp[i], dp[i-j]+1)
+        if dp[amount] == sys.maxint:
+            return -1
+        return dp[amount]
+```
+
+\279. Perfect Squares
+
+Medium
+
+7124310Add to ListShare
+
+Given an integer `n`, return *the least number of perfect square numbers that sum to* `n`.
+
+A **perfect square** is an integer that is the square of an integer; in other words, it is the product of some integer with itself. For example, `1`, `4`, `9`, and `16` are perfect squares while `3` and `11` are not.
+
+ 
+
+**Example 1:**
+
+```
+Input: n = 12
+Output: 3
+Explanation: 12 = 4 + 4 + 4.
+```
+
+```py
+class Solution(object):
+    def numSquares(self, n):
+        """
+        :type n: int
+        :rtype: int
+        DP完全背包
+        dp[i] = i最小能有几个ps
+        dp[i] = min(dp[i], dp[i-j]+1)\
+        [0,!,!,!,!]
+        doesnt matter what order
+        """
+        dp = [sys.maxint] * (n+1)
+        dp[0] = 0
+        for i in range(1,n+1):
+            for j in range(1,int(math.sqrt(n))+1):
+                if i>=j*j:
+                    dp[i] = min(dp[i], dp[i-j*j]+1)
+        return dp[n]
+        
+```
 
 
 

@@ -4390,6 +4390,177 @@ Explanation: The shortest path is: 3 → 1 → 5 → 2 → 6.
 
 #### BFS
 
+\100. Same Tree
+
+Easy
+
+6455147Add to ListShare
+
+Given the roots of two binary trees `p` and `q`, write a function to check if they are the same or not.
+
+Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/12/20/ex1.jpg)
+
+```
+Input: p = [1,2,3], q = [1,2,3]
+Output: true
+```
+
+```py
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def isSameTree(self, p, q):
+        """
+        :type p: TreeNode
+        :type q: TreeNode
+        :rtype: bool
+        """
+        if not p and not q:
+            return True
+        que = collections.deque()
+        que.append((p,q))
+        while que:
+            temp1, temp2 = que.popleft()
+            if temp1 == None and temp2 == None:
+                continue
+            elif temp1 == None or temp2 == None:
+                return False
+            else:
+                if temp1.val != temp2.val:
+                    return False
+                que.append((temp1.left, temp2.left))
+                que.append((temp1.right, temp2.right))
+        return True
+```
+
+\101. Symmetric Tree
+
+Easy
+
+10255243Add to ListShare
+
+Given the `root` of a binary tree, *check whether it is a mirror of itself* (i.e., symmetric around its center).
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/19/symtree1.jpg)
+
+```
+Input: root = [1,2,2,3,4,4,3]
+Output: true
+```
+
+```py
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def isSymmetric(self, root: Optional[TreeNode]) -> bool:
+        """
+        BFS
+        """
+        if not root:
+            return True
+        que = collections.deque()
+        que.append((root.left, root.right))
+        while que:
+            left, right = que.popleft()
+            if left == None and right == None:
+                continue
+            elif left == None or right == None:
+                return False
+            elif left.val != right.val:
+                return False
+            que.append((left.left, right.right))
+            que.append((left.right,right.left))
+        return True
+```
+
+\117. Populating Next Right Pointers in Each Node II
+
+Medium
+
+4634267Add to ListShare
+
+Given a binary tree
+
+```
+struct Node {
+  int val;
+  Node *left;
+  Node *right;
+  Node *next;
+}
+```
+
+Populate each next pointer to point to its next right node. If there is no next right node, the next pointer should be set to `NULL`.
+
+Initially, all next pointers are set to `NULL`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2019/02/15/117_sample.png)
+
+```
+Input: root = [1,2,3,4,5,null,7]
+Output: [1,#,2,3,#,4,5,7,#]
+Explanation: Given the above binary tree (Figure A), your function should populate each next pointer to point to its next right node, just like in Figure B. The serialized output is in level order as connected by the next pointers, with '#' signifying the end of each level.
+```
+
+```py
+"""
+# Definition for a Node.
+class Node(object):
+    def __init__(self, val=0, left=None, right=None, next=None):
+        self.val = val
+        self.left = left
+        self.right = right
+        self.next = next
+"""
+
+class Solution(object):
+    def connect(self, root):
+        """
+        :type root: Node
+        :rtype: Node
+        BFS, but in each level we need to use DFS way
+        """
+        if not root:
+            return
+        que = collections.deque()
+        que.append(root)
+        while que:
+            prev = None
+            for i in range(len(que)):
+                cur = que.popleft()
+                if cur.left:
+                    que.append(cur.left)
+                if cur.right:
+                    que.append(cur.right)
+                if prev != None:
+                    prev.next = cur
+                prev = cur
+            prev.next = None
+        return root
+```
+
 **200. Number of Islands**
 
 Given an `m x n` 2D binary grid `grid` which represents a map of `'1'`s (land) and `'0'`s (water), return *the number of islands*.
@@ -7278,7 +7449,32 @@ class Solution(object):
 
 #### 01背包问题
 
+##### intro
+
 ![416.分割等和子集1](https://camo.githubusercontent.com/5c5af3f54a3503cdb989ab1c28e2933202a33259608c70af0e72db5a858f14e6/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303231303131373137313330373430372e706e67)
+
+问能否能装满背包（或者最多装多少）：dp[j] = max(dp[j], dp[j - nums[i]] + nums[i]); ，对应题目如下：
+
+- [动态规划：416.分割等和子集](https://programmercarl.com/0416.分割等和子集.html)
+- [动态规划：1049.最后一块石头的重量 II](https://programmercarl.com/1049.最后一块石头的重量II.html)
+
+问装满背包有几种方法：dp[j] += dp[j - nums[i]] ，对应题目如下：
+
+- [动态规划：494.目标和](https://programmercarl.com/0494.目标和.html)
+- [动态规划：518. 零钱兑换 II](https://programmercarl.com/0518.零钱兑换II.html)
+- [动态规划：377.组合总和Ⅳ](https://programmercarl.com/0377.组合总和Ⅳ.html)
+- [动态规划：70. 爬楼梯进阶版（完全背包）](https://programmercarl.com/0070.爬楼梯完全背包版本.html)
+
+问背包装满最大价值：dp[j] = max(dp[j], dp[j - weight[i]] + value[i]); ，对应题目如下：
+
+- [动态规划：474.一和零](https://programmercarl.com/0474.一和零.html)
+
+问装满背包所有物品的最小个数：dp[j] = min(dp[j - coins[i]] + 1, dp[j]); ，对应题目如下：
+
+- [动态规划：322.零钱兑换](https://programmercarl.com/0322.零钱兑换.html)
+- [动态规划：279.完全平方数](https://programmercarl.com/0279.完全平方数.html)
+
+![img](https://camo.githubusercontent.com/0f1e8c608f9f618ed4df4571907bcf5df1058e0a5b532bef8ed8f34425cee2d6/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f254538253833253843254535253843253835254539253937254145254539254132253938312e6a706567)
 
 ##### 二维dp数组01背包
 
@@ -7836,7 +8032,292 @@ class Solution(object):
         
 ```
 
+#### House Robbing
 
+\198. House Robber
+
+Medium
+
+13501280Add to ListShare
+
+You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security systems connected and **it will automatically contact the police if two adjacent houses were broken into on the same night**.
+
+Given an integer array `nums` representing the amount of money of each house, return *the maximum amount of money you can rob tonight **without alerting the police***.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [1,2,3,1]
+Output: 4
+Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).
+Total amount you can rob = 1 + 3 = 4.
+```
+
+```py
+class Solution(object):
+    def rob(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        Robbing, DP
+        dp[i] = max for house i
+        dp[1:2] = nums[1:2]
+        dp[i] = max(dp[i-3]+nums[i], dp[i-2]+nums[i])
+        left to right
+        for i in dp[]
+            for j in nums
+        [2,7,9,3,1]
+        [0,2,7,11,10,12]
+        return max(dp[-1],dp[-2])
+        """
+        if len(nums) == 1:
+            return nums[0]
+        dp = [0] * (len(nums)+1)
+        dp[1] = nums[0]
+        dp[2] = nums[1]
+        for i in range(3, len(nums)+1):
+            dp[i] = max(dp[i-3]+nums[i-1], dp[i-2]+nums[i-1])
+        return max(dp[-1],dp[-2])
+```
+
+\213. House Robber II
+
+Medium
+
+624797Add to ListShare
+
+You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed. All houses at this place are **arranged in a circle.** That means the first house is the neighbor of the last one. Meanwhile, adjacent houses have a security system connected, and **it will automatically contact the police if two adjacent houses were broken into on the same night**.
+
+Given an integer array `nums` representing the amount of money of each house, return *the maximum amount of money you can rob tonight **without alerting the police***.
+
+ 
+
+**Example 1:**
+
+```
+Input: nums = [2,3,2]
+Output: 3
+Explanation: You cannot rob house 1 (money = 2) and then rob house 3 (money = 2), because they are adjacent houses.
+```
+
+```py
+class Solution(object):
+    def rob(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        two cases, either rob first, or rob last
+        dp[i] = max for house i
+        dp[1:2] = nums[1:2]
+        dp[i] = max(dp[i-1], dp[i-2]+nums[i])
+        left to right
+        for i in dp[]
+            for j in nums
+        return max(dp[-1],dp[-2])
+        """
+        if len(nums) == 1:
+            return nums[0]
+        if len(nums) == 2:
+            return max(nums[0], nums[1])
+        res1 = self.helper(nums, 0, len(nums)-2)
+        res2 = self.helper(nums, 1, len(nums)-1)
+        return max(res1, res2)
+    
+    def helper(self,nums,start,end):
+        dp = [0] * len(nums)
+        dp[start] = nums[start]
+        dp[start+1] = max(nums[start], nums[start + 1])
+        for i in range(start+1, end+1):
+            dp[i] = max(dp[i-1], dp[i-2]+nums[i])
+        return max(dp[-1], dp[-2])
+```
+
+\337. House Robber III
+
+Medium
+
+656597Add to ListShare
+
+The thief has found himself a new place for his thievery again. There is only one entrance to this area, called `root`.
+
+Besides the `root`, each house has one and only one parent house. After a tour, the smart thief realized that all houses in this place form a binary tree. It will automatically contact the police if **two directly-linked houses were broken into on the same night**.
+
+Given the `root` of the binary tree, return *the maximum amount of money the thief can rob **without alerting the police***.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/03/10/rob1-tree.jpg)
+
+```
+Input: root = [3,2,3,null,3,null,1]
+Output: 7
+Explanation: Maximum amount of money the thief can rob = 3 + 3 + 1 = 7.
+```
+
+```py
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def rob(self, root):
+        """
+        :type root: TreeNode
+        :rtype: int
+        树状DP， 因为要从地下往上算最多偷多少，DFS后序
+        DP[0] = 不偷最多多少
+        Dp[1] = 偷最多多少
+        """
+        res = self.helper(root)
+        return max(res[0], res[1])
+    
+    def helper(self, root):
+        if not root:
+            return [0,0]
+        left = self.helper(root.left)
+        right = self.helper(root.right)
+        #不偷此节点，可偷可不偷子节点
+        leftMax = max(left[1], left[0]) + max(right[1], right[0])
+        #偷此节点，加上子节点的子节点
+        rightMax = root.val + left[0] + right[0]
+        return [leftMax, rightMax]
+```
+
+#### 股票(暂时没懂，三维？)
+
+\121. Best Time to Buy and Sell Stock
+
+Easy
+
+18159583Add to ListShare
+
+You are given an array `prices` where `prices[i]` is the price of a given stock on the `ith` day.
+
+You want to maximize your profit by choosing a **single day** to buy one stock and choosing a **different day in the future** to sell that stock.
+
+Return *the maximum profit you can achieve from this transaction*. If you cannot achieve any profit, return `0`.
+
+ 
+
+**Example 1:**
+
+```
+Input: prices = [7,1,5,3,6,4]
+Output: 5
+Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
+Note that buying on day 2 and selling on day 1 is not allowed because you must buy before you sell.
+```
+
+```py
+class Solution(object):
+    def maxProfit(self, prices):
+        """
+        :type prices: List[int]
+        :rtype: int
+        If have to solve with dp way
+        dp[i][0] = money have if we hold stock
+        dp[i][1] = money have if we dont hold stock
+        dp[i][0] = max(dp[i-1][0], -prices[i])
+        dp[i][1] = max(dp[i-1][1], dp[i-1][0] + prices[i]) 
+        """
+        n = len(prices)
+        if n == 1:
+            return 0
+        dp = [[0,0],[0,0]]
+        dp[0][0] = -prices[0]
+        for i in range(1, n):
+            #如果第i天持有股票即dp[i][0]， 那么可以由两个状态推出来
+                #第i-1天就持有股票，那么就保持现状，所得现金就是昨天持有股票的所得现金 即：dp[i - 1][0]
+                #第i天买入股票，所得现金就是买入今天的股票后所得现金即：-prices[i]
+            #dp[i][0] = max(dp[i-1][0], -prices[i])
+            dp[i % 2][0] = max(dp[(i - 1) % 2][0], -prices[i])
+            
+            #如果第i天不持有股票即dp[i][1]， 也可以由两个状态推出来
+                #第i-1天就不持有股票，那么就保持现状，所得现金就是昨天不持有股票的所得现金 即：dp[i - 1][1]
+                #第i天卖出股票，所得现金就是按照今天股票佳价格卖出后所得现金即：prices[i] + dp[i - 1][0]
+            #dp[i][1] = max(dp[i-1][1], dp[i-1][0] + prices[i]) 
+            dp[i % 2][1] = max(dp[(i - 1) % 2][1], prices[i] + dp[(i - 1) % 2][0])
+        
+        return dp[(n - 1) % 2][1]
+```
+
+\122. Best Time to Buy and Sell Stock II
+
+Medium
+
+83512412Add to ListShare
+
+You are given an integer array `prices` where `prices[i]` is the price of a given stock on the `ith` day.
+
+On each day, you may decide to buy and/or sell the stock. You can only hold **at most one** share of the stock at any time. However, you can buy it then immediately sell it on the **same day**.
+
+Find and return *the **maximum** profit you can achieve*.
+
+ 
+
+**Example 1:**
+
+```
+Input: prices = [7,1,5,3,6,4]
+Output: 7
+Explanation: Buy on day 2 (price = 1) and sell on day 3 (price = 5), profit = 5-1 = 4.
+Then buy on day 4 (price = 3) and sell on day 5 (price = 6), profit = 6-3 = 3.
+Total profit is 4 + 3 = 7.
+```
+
+```py
+class Solution(object):
+    def maxProfit(self, prices):
+        """
+        :type prices: List[int]
+        :rtype: int
+        """
+        """
+        Greedy, form start, if less than prev, record res, else continue
+        res, low = 0, 0
+        for i in range(len(prices)-1):
+            temp = prices[i+1] - prices[i]
+            if temp > 0:
+                res += temp
+        
+        return res
+        """
+
+        
+        """
+        2D DP
+        DP[i][0] = if we hold stock, how much cash we have
+        DP[i][1] = if we sell stock, how much cash we have
+        Dp[i][0] = max(dp[i-1][0], dp[i-1][1]-prices[i])
+        dp[i][1] = max(dp[i-1][1], dp[i-1][0] + prices[i])
+        dp[0][0] = -prices[0]
+        """
+        n = len(prices)
+        dp = [[0,0] for _ in range(n)]
+        dp[0][0] = -prices[0]
+        for i in range(1, n):
+            #is it more to hold or sell and add the profit 
+            dp[i][0] = max(dp[i-1][0], dp[i-1][1]-prices[i])
+            #should we not sell or sell at current value 
+            dp[i][1] = max(dp[i-1][1], dp[i-1][0] + prices[i])
+        return dp[n-1][1]
+```
+
+#### 子序列
+
+##### 不连续
+
+##### 连续
+
+##### 编辑距离
+
+##### 回文
 
 
 
@@ -7886,7 +8367,8 @@ class Solution(object):
   }
   ```
 
-  
+
+
 
 #### Selection Sort:
 

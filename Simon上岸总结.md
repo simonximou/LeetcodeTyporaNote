@@ -3832,6 +3832,254 @@ class Solution(object):
 
 #### DFS
 
+\341. Flatten Nested List Iterator
+
+Medium
+
+38431340Add to ListShare
+
+You are given a nested list of integers `nestedList`. Each element is either an integer or a list whose elements may also be integers or other lists. Implement an iterator to flatten it.
+
+Implement the `NestedIterator` class:
+
+- `NestedIterator(List<NestedInteger> nestedList)` Initializes the iterator with the nested list `nestedList`.
+- `int next()` Returns the next integer in the nested list.
+- `boolean hasNext()` Returns `true` if there are still some integers in the nested list and `false` otherwise.
+
+Your code will be tested with the following pseudocode:
+
+```
+initialize iterator with nestedList
+res = []
+while iterator.hasNext()
+    append iterator.next() to the end of res
+return res
+```
+
+```py
+class NestedIterator(object):
+
+    def __init__(self, nestedList):
+        """
+        Initialize your data structure here.
+        :type nestedList: List[NestedInteger]
+        """
+        self.position = 0
+        self.lists = []
+        def dfs(nested):
+            for i in nested:
+                #if integer, append
+                if i.isInteger():
+                    self.lists.append(i.getInteger())
+                #if nestedList, dfs the list
+                else:
+                    dfs(i.getList())
+        
+        dfs(nestedList)
+        
+    
+    def next(self):
+        """
+        :rtype: int
+        """
+        res = self.lists[self.position]
+        self.position += 1
+        return res
+        
+
+    def hasNext(self):
+        """
+        :rtype: bool
+        """
+        if self.position == len(self.lists):
+            return False
+        return True
+        
+```
+
+\545. Boundary of Binary Tree
+
+Medium
+
+11361824Add to ListShare
+
+The **boundary** of a binary tree is the concatenation of the **root**, the **left boundary**, the **leaves** ordered from left-to-right, and the **reverse order** of the **right boundary**.
+
+The **left boundary** is the set of nodes defined by the following:
+
+- The root node's left child is in the left boundary. If the root does not have a left child, then the left boundary is **empty**.
+- If a node in the left boundary and has a left child, then the left child is in the left boundary.
+- If a node is in the left boundary, has **no** left child, but has a right child, then the right child is in the left boundary.
+- The leftmost leaf is **not** in the left boundary.
+
+The **right boundary** is similar to the **left boundary**, except it is the right side of the root's right subtree. Again, the leaf is **not** part of the **right boundary**, and the **right boundary** is empty if the root does not have a right child.
+
+The **leaves** are nodes that do not have any children. For this problem, the root is **not** a leaf.
+
+Given the `root` of a binary tree, return *the values of its **boundary***.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/11/11/boundary1.jpg)
+
+```
+Input: root = [1,null,2,3,4]
+Output: [1,3,4,2]
+Explanation:
+- The left boundary is empty because the root does not have a left child.
+- The right boundary follows the path starting from the root's right child 2 -> 4.
+  4 is a leaf, so the right boundary is [2].
+- The leaves from left to right are [3,4].
+Concatenating everything results in [1] + [] + [3,4] + [2] = [1,3,4,2].
+```
+
+```py
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def boundaryOfBinaryTree(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        def dfs(root, way):
+            res = []
+            if not root:
+                return []
+            #left
+            if way == 0:
+                if not root.left and not root.right:
+                    return res
+                elif root.left:
+                    res.append(root.val)
+                    return res + dfs(root.left, 0)
+                elif root.right:
+                    res.append(root.val)
+                    return res + dfs(root.right, 0)
+            #right
+            elif way == 1:
+                if not root.left and not root.right:
+                    return res
+                elif root.right:
+                    res.append(root.val)
+                    return res + dfs(root.right, 1)
+                elif root.left:
+                    res.append(root.val)
+                    return res + dfs(root.left, 1)
+            else:
+                if not root.left and not root.right:
+                    res.append(root.val)
+                    return res
+                if root.left and root.right:
+                    return dfs(root.left, 2) + dfs(root.right, 2)
+                elif root.left:
+                    return dfs(root.left, 2)
+                elif root.right:
+                    return dfs(root.right, 2)
+                
+
+                
+        if not root.left and not root.right:
+            return [root.val]
+        #left boundary
+        left = dfs(root.left, 0)
+        #leaf
+        leaf = dfs(root, 2)
+        #right boundary
+        right = dfs(root.right, 1)
+        
+        return [root.val]+left+leaf+right[::-1]
+```
+
+\99. Recover Binary Search Tree
+
+Medium
+
+5779190Add to ListShare
+
+You are given the `root` of a binary search tree (BST), where the values of **exactly** two nodes of the tree were swapped by mistake. *Recover the tree without changing its structure*.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/10/28/recover1.jpg)
+
+```
+Input: root = [1,3,null,null,2]
+Output: [3,1,null,null,2]
+Explanation: 3 cannot be a left child of 1 because 3 > 1. Swapping 1 and 3 makes the BST valid.
+```
+
+```py
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution(object):
+    def recoverTree(self, root):
+        """
+        :type root: TreeNode
+        :rtype: None Do not return anything, modify root in-place instead.
+        """
+        """
+        use inorder traversal, arr will be accending 
+        , find two mistakes
+        """
+        ### can be solved with morris, costant space
+        ###                     Recursive: easiest
+        # arr = []
+        # def inorder(root):
+        #     if root:
+        #         inorder(root.left)
+        #         arr.append(root)
+        #         inorder(root.right)
+        # inorder(root)
+        # mis1 = arr[0]
+        # mis2 = arr[-1]
+        # for i in range(1,len(arr)):
+        #     if arr[i].val < arr[i-1].val:
+        #         mis1 = arr[i-1]
+        #         break
+        # for j in range(len(arr)-2, -1,-1):
+        #     if arr[j].val > arr[j+1].val:
+        #         mis2 = arr[j+1]
+        #         break
+        # mis1.val, mis2.val = mis2.val, mis1.val
+        
+        
+        ###Inorder Traversal: Iterative: Best Time Performance
+        stack = []
+        x = y = pred = None
+        
+        while stack or root:
+            while root:
+                stack.append(root)
+                root = root.left
+            root = stack.pop()
+            if pred and root.val < pred.val:
+                y = root
+                if x is None:
+                    x = pred 
+                else:
+                    break
+            pred = root
+            root = root.right
+
+        x.val, y.val = y.val, x.val
+        
+```
+
+
+
 **695. Max Area of Island**
 
 You are given an `m x n` binary matrix `grid`. An island is a group of `1`'s (representing land) connected **4-directionally** (horizontal or vertical.) You may assume all four edges of the grid are surrounded by water.
@@ -4388,7 +4636,210 @@ Explanation: The shortest path is: 3 → 1 → 5 → 2 → 6.
 
 ```
 
+\430. Flatten a Multilevel Doubly Linked List
+
+Medium
+
+3911273Add to ListShare
+
+You are given a doubly linked list, which contains nodes that have a next pointer, a previous pointer, and an additional **child pointer**. This child pointer may or may not point to a separate doubly linked list, also containing these special nodes. These child lists may have one or more children of their own, and so on, to produce a **multilevel data structure** as shown in the example below.
+
+Given the `head` of the first level of the list, **flatten** the list so that all the nodes appear in a single-level, doubly linked list. Let `curr` be a node with a child list. The nodes in the child list should appear **after** `curr` and **before** `curr.next` in the flattened list.
+
+Return *the* `head` *of the flattened list. The nodes in the list must have **all** of their child pointers set to* `null`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/11/09/flatten11.jpg)
+
+```
+Input: head = [1,2,3,4,5,6,null,null,null,7,8,9,10,null,null,11,12]
+Output: [1,2,3,7,8,11,12,9,10,4,5,6]
+```
+
+```py
+class Solution(object):
+    def flatten(self, head):
+        """
+        :type head: Node
+        :rtype: Node
+        """
+        
+        def dfs(head):
+            while head:
+                if head.child:
+                    if head.next:
+                        tail = dfs(head.child)
+                        temp = head.next
+                        temp.prev = tail
+                        tail.next = temp
+                        head.next = head.child
+                        head.child.prev = head
+                        head.child = None
+                        head = tail
+                    else:
+                        head.next = head.child
+                        head.child.prev = head
+                        head.child = None
+                if head.next:
+                    head = head.next
+                else:
+                    break
+            return head
+        if not head:
+            return 
+        dfs(head)
+        return head
+        
+```
+
+\98. Validate Binary Search Tree
+
+Medium
+
+11023945Add to ListShare
+
+Given the `root` of a binary tree, *determine if it is a valid binary search tree (BST)*.
+
+A **valid BST** is defined as follows:
+
+- The left subtree of a node contains only nodes with keys **less than** the node's key.
+- The right subtree of a node contains only nodes with keys **greater than** the node's key.
+- Both the left and right subtrees must also be binary search trees.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/12/01/tree1.jpg)
+
+```
+Input: root = [2,1,3]
+Output: true
+```
+
+```py
+#Brute Force
+class Solution(object):
+    def isValidBST(self, root):
+        """
+        :type root: TreeNode
+        :rtype: bool
+        """
+        """
+        Inorder traversal, BST can be converted into a sorted array
+        """
+        def inorder(root):
+            if not root:
+                return []
+            return inorder(root.left)+[root.val]+inorder(root.right)
+        
+        arr = inorder(root)
+        for i in range(1, len(arr)):
+            if arr[i] <= arr[i-1]:
+                return False
+        return True
+    	
+        """
+        DFS inplace
+        """
+        def dfs(root, low, high):
+            if not root:
+				# empty node or empty tree
+                return True
+            
+            if low < root.val < high:
+				# check if all tree nodes follow BST rule
+                return dfs(root.left, low, root.val) and dfs(root.right, root.val, high)
+            
+            else:
+				# early reject when we find violation
+                return False 
+        
+        return dfs(root, -sys.maxsize, sys.maxsize)
+        
+    	
+        
+```
+
+\419. Battleships in a Board
+
+Medium
+
+1655794Add to ListShare
+
+Given an `m x n` matrix `board` where each cell is a battleship `'X'` or empty `'.'`, return *the number of the **battleships** on* `board`.
+
+**Battleships** can only be placed horizontally or vertically on `board`. In other words, they can only be made of the shape `1 x k` (`1` row, `k` columns) or `k x 1` (`k` rows, `1` column), where `k` can be of any size. At least one horizontal or vertical cell separates between two battleships (i.e., there are no adjacent battleships).
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/04/10/battelship-grid.jpg)
+
+```
+Input: board = [["X",".",".","X"],[".",".",".","X"],[".",".",".","X"]]
+Output: 2
+```
+
+```py
+class Solution(object):
+    def countBattleships(self, board):
+        """
+        :type board: List[List[str]]
+        :rtype: int
+        """
+        """
+        DFS + VISITED
+        """
+        row, col = len(board), len(board[0])
+        res = 0
+        
+        def dfs(board, i, j):
+            board[i][j] = "."
+            directions = [(1,0),(0,1),(-1,0),(0,-1)]
+            for a,b in directions:
+                if 0<=i+a<row and 0<=j+b<col and board[i+a][j+b] == "X":
+                    dfs(board, i+a, j+b)
+                
+        for i in range(row):
+            for j in range(col):
+                if board[i][j] == "X":
+                    res += 1
+                    dfs(board, i, j)
+        return res
+```
+
+
+
+
+
 #### BFS
+
+##### basics
+
+```py
+#First create queue / and visited set
+que = collections.deque()
+visited = set()
+//directions = [(0,1),(1,0), (-1,0), (0,-1)]
+#append first case into que
+que.append((x))
+#BFS, while que, search the first poped ited in que, if found item, push into que
+while que:
+    cur = que.popleft()
+    #if cur == what we want to find
+    if res?:
+        return 
+    #if valid neibor found, push into que
+    if ////:
+        que.append(next)
+#res not found, return -1
+return baseCase
+```
 
 \100. Same Tree
 
@@ -4561,6 +5012,55 @@ class Solution(object):
         return root
 ```
 
+\339. Nested List Weight Sum
+
+Medium
+
+1398316Add to ListShare
+
+You are given a nested list of integers `nestedList`. Each element is either an integer or a list whose elements may also be integers or other lists.
+
+The **depth** of an integer is the number of lists that it is inside of. For example, the nested list `[1,[2,2],[[3],2],1]` has each integer's value set to its **depth**.
+
+Return *the sum of each integer in* `nestedList` *multiplied by its **depth***.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/01/14/nestedlistweightsumex1.png)
+
+```
+Input: nestedList = [[1,1],2,[1,1]]
+Output: 10
+Explanation: Four 1's at depth 2, one 2 at depth 1. 1*2 + 1*2 + 2*1 + 1*2 + 1*2 = 10.
+```
+
+```py
+class Solution(object):
+    def depthSum(self, nestedList):
+        """
+        :type nestedList: List[NestedInteger]
+        :rtype: int
+        """
+        #BFS solution
+         # initialize the queue
+        queue = deque([[1, item] for item in nestedList])
+        total = 0
+        # bfs search and update total
+        while queue:
+            # pop left
+            level, item = queue.popleft()
+            # evaluate
+            if item.isInteger():
+                total += level * item.getInteger()
+            else:
+                # append the children
+                for element in item.getList():
+                    queue.append([level+1, element])
+        return total
+```
+
 **200. Number of Islands**
 
 Given an `m x n` 2D binary grid `grid` which represents a map of `'1'`s (land) and `'0'`s (water), return *the number of islands*.
@@ -4583,25 +5083,341 @@ Output: 1
 from collections import deque
 class Solution(object):
     def numIslands(self, grid):
+        """
+        Better BFS VERSION
+        """
+        if not grid:
+            return 0
+        que = collections.deque()
+        row,col = len(grid),len(grid[0])
+        res = 0
+        for i in range(row):
+            for j in range(col):
+                if grid[i][j] == "1":
+                    que.append((i,j))
+                    res += 1
+                    while que:
+                        cur_row, cur_col = que.popleft()
+                        if 0<=cur_row<row and 0<=cur_col<col and grid[cur_row][cur_col] == "1":
+                            grid[cur_row][cur_col] = "0"
+                            que.append((cur_row+1,cur_col))
+                            que.append((cur_row,cur_col+1))
+                            que.append((cur_row-1,cur_col))
+                            que.append((cur_row,cur_col-1))
+        
+        return res
+```
+
+\1091. Shortest Path in Binary Matrix
+
+Medium
+
+3712164Add to ListShare
+
+Given an `n x n` binary matrix `grid`, return *the length of the shortest **clear path** in the matrix*. If there is no clear path, return `-1`.
+
+A **clear path** in a binary matrix is a path from the **top-left** cell (i.e., `(0, 0)`) to the **bottom-right** cell (i.e., `(n - 1, n - 1)`) such that:
+
+- All the visited cells of the path are `0`.
+- All the adjacent cells of the path are **8-directionally** connected (i.e., they are different and they share an edge or a corner).
+
+The **length of a clear path** is the number of visited cells of this path.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/02/18/example1_1.png)
+
+```
+Input: grid = [[0,1],[1,0]]
+Output: 2
+```
+
+```py
+class Solution(object):
+    def shortestPathBinaryMatrix(self, grid):
+        """
+        :type grid: List[List[int]]
+        :rtype: int
+        BFS
+        """
+        
+        #store que
+        #store visited
+        #initialize with top left
+        que = collections.deque()
+        que.append((0,0,1))
+        row, col = len(grid), len(grid[0])
+        
+        while que:
+            i,j,length = que.popleft()
+            #if bottom right
+            if i == row-1 and j == col-1 and grid[i][j] == 0:
+                #return length
+                return length
+            #if valid and not visited and ==0:
+            if 0<=i<row and 0<=j<col and grid[i][j] == 0:
+                grid[i][j] = 1
+                #add path into que and length+1
+                que.append((i+1,j-1,length+1))
+                que.append((i+1,j,length+1))
+                que.append((i+1,j+1,length+1))
+                que.append((i,j-1,length+1))
+                que.append((i,j+1,length+1))
+                que.append((i-1,j-1,length+1))
+                que.append((i-1,j,length+1))
+                que.append((i-1,j+1,length+1))
+        return -1
+```
+
+\695. Max Area of Island
+
+Medium
+
+7440168Add to ListShare
+
+You are given an `m x n` binary matrix `grid`. An island is a group of `1`'s (representing land) connected **4-directionally** (horizontal or vertical.) You may assume all four edges of the grid are surrounded by water.
+
+The **area** of an island is the number of cells with a value `1` in the island.
+
+Return *the maximum **area** of an island in* `grid`. If there is no island, return `0`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/05/01/maxarea1-grid.jpg)
+
+```
+Input: grid = [[0,0,1,0,0,0,0,1,0,0,0,0,0],[0,0,0,0,0,0,0,1,1,1,0,0,0],[0,1,1,0,1,0,0,0,0,0,0,0,0],[0,1,0,0,1,1,0,0,1,0,1,0,0],[0,1,0,0,1,1,0,0,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,1,1,1,0,0,0],[0,0,0,0,0,0,0,1,1,0,0,0,0]]
+Output: 6
+Explanation: The answer is not 11, because the island must be connected 4-directionally.
+```
+
+```py
+class Solution(object):
+    def maxAreaOfIsland(self, grid):
+        """
+        BFS
+        """
+        #que to store bfs 
+        #res to store 
+        que = collections.deque()
+        res = 0
+        row,col = len(grid), len(grid[0])
+        area = 0
+        #BFS
+        for i in range(row):
+            for j in range(col):
+                #if find an island 
+                if grid[i][j] == 1:
+                    que.append((i,j))
+                    while que:
+                        x,y = que.popleft()
+                        if 0<=x<row and 0<=y<col and grid[x][y] == 1:
+                            area += 1
+                            grid[x][y] = 0
+                            que.append((x+1,y))
+                            que.append((x,y+1))
+                            que.append((x-1,y))
+                            que.append((x,y-1))
+                    res = max(res,area)
+                    area = 0
+        return res
+        
+```
+
+\1197. Minimum Knight Moves
+
+Medium
+
+1250358Add to ListShare
+
+In an **infinite** chess board with coordinates from `-infinity` to `+infinity`, you have a **knight** at square `[0, 0]`.
+
+A knight has 8 possible moves it can make, as illustrated below. Each move is two squares in a cardinal direction, then one square in an orthogonal direction.
+
+![img](https://assets.leetcode.com/uploads/2018/10/12/knight.png)
+
+Return *the minimum number of steps needed to move the knight to the square* `[x, y]`. It is guaranteed the answer exists.
+
+ 
+
+**Example 1:**
+
+```
+Input: x = 2, y = 1
+Output: 1
+Explanation: [0, 0] → [2, 1]
+```
+
+```py
+class Solution(object):
+    def minKnightMoves(self, x, y):
+        """
+        :type x: int
+        :type y: int
+        :rtype: int
+        """
+        """
+        暴力BFS
+        """
+        que = collections.deque()
+        que.append((0,0,0))
+        moves = [(1,2),(2,1),(-1,-2),(-2,-1),(-1,2),(-2,1),(2,-1),(1,-2)]
+        visited = set((0,0))
+        x,y = abs(x),abs(y)
+        while que:
+            i,j,steps = que.popleft()
+            if i == x and j == y:
+                return steps
+            for a,b in moves:
+                if (i+a,j+b) not in visited and -1<=i+a<=x+2 and -1<=j+b<=y+2:
+                    visited.add((i+a,j+b))
+                    que.append((i+a,j+b,steps+1))
+        return -1
+```
+
+\994. Rotting Oranges
+
+Medium
+
+7517288Add to ListShare
+
+You are given an `m x n` `grid` where each cell can have one of three values:
+
+- `0` representing an empty cell,
+- `1` representing a fresh orange, or
+- `2` representing a rotten orange.
+
+Every minute, any fresh orange that is **4-directionally adjacent** to a rotten orange becomes rotten.
+
+Return *the minimum number of minutes that must elapse until no cell has a fresh orange*. If *this is impossible, return* `-1`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2019/02/16/oranges.png)
+
+```
+Input: grid = [[2,1,1],[1,1,0],[0,1,1]]
+Output: 4
+```
+
+```py
+class Solution(object):
+    def orangesRotting(self, grid):
+        """
+        :type grid: List[List[int]]
+        :rtype: int
+        BFS
+        """
         if not grid:
             return 0
         res = 0
-        check = [[False for _ in range(len(grid[0]))] for _ in range(len(grid))]
-        for row in range(len(grid)):
-            for col in range(len(grid[0])):
-                if grid[row][col] == "1" and check[row][col] == False:
-                    res +=1 
-                    self.bfs(check, row, col, grid)
+        que = collections.deque()
+        directions = [(0,1),(1,0),(0,-1),(-1,0)]
+        visited = set()
+        count = 0
+        row, col = len(grid), len(grid[0])
+        for i in range(row):
+            for j in range(col):
+                if grid[i][j] == 2:
+                    que.append((i,j,0))
+                elif grid[i][j] == 1:
+                    count += 1
+ 
+        while que:
+            x,y,time = que.popleft()
+            grid[x][y] = 2
+            for a,b in directions:
+                if 0<=x+a<row and 0<=y+b<col and (x+a, y+b) not in visited and grid[x+a][y+b] == 1:
+                    que.append((x+a,y+b,time+1))
+                    visited.add((x+a, y+b))
+            res = max(res,time)
+        if len(visited) != count:
+            return -1
         return res
+```
+
+\529. Minesweeper
+
+Medium
+
+1492898Add to ListShare
+
+Let's play the minesweeper game ([Wikipedia](https://en.wikipedia.org/wiki/Minesweeper_(video_game)), [online game](http://minesweeperonline.com/))!
+
+You are given an `m x n` char matrix `board` representing the game board where:
+
+- `'M'` represents an unrevealed mine,
+- `'E'` represents an unrevealed empty square,
+- `'B'` represents a revealed blank square that has no adjacent mines (i.e., above, below, left, right, and all 4 diagonals),
+- digit (`'1'` to `'8'`) represents how many mines are adjacent to this revealed square, and
+- `'X'` represents a revealed mine.
+
+You are also given an integer array `click` where `click = [clickr, clickc]` represents the next click position among all the unrevealed squares (`'M'` or `'E'`).
+
+Return *the board after revealing this position according to the following rules*:
+
+1. If a mine `'M'` is revealed, then the game is over. You should change it to `'X'`.
+2. If an empty square `'E'` with no adjacent mines is revealed, then change it to a revealed blank `'B'` and all of its adjacent unrevealed squares should be revealed recursively.
+3. If an empty square `'E'` with at least one adjacent mine is revealed, then change it to a digit (`'1'` to `'8'`) representing the number of adjacent mines.
+4. Return the board when no more squares will be revealed.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2018/10/12/minesweeper_example_1.png)
+
+```
+Input: board = [["E","E","E","E","E"],["E","E","M","E","E"],["E","E","E","E","E"],["E","E","E","E","E"]], click = [3,0]
+Output: [["B","1","E","1","B"],["B","1","M","1","B"],["B","1","1","1","B"],["B","B","B","B","B"]]
+```
+
+```py
+class Solution(object):
+    def updateBoard(self, board, click):
+        """
+        :type board: List[List[str]]
+        :type click: List[int]
+        :rtype: List[List[str]]
+        """
+        """
+        BFS, start with click
+        """
+        #que to store next step
+        que = collections.deque()
+        que.append((click[0],click[1]))
+        directions = [(1,0),(0,1),(1,1),(1,-1),(-1,1),(-1,-1),(-1,0),(0,-1)]
+        row, col = len(board),len(board[0])
         
+        while que:
+            i, j = que.popleft()
+            mineCount = 0
+            #return if mine
+            if board[i][j] == "M":
+                board[i][j] = "X"
+                return board
+            #check digit and change value
+            for a, b in directions:
+                if 0<=i+a<row and 0<=j+b<col and board[i+a][j+b] == "M":
+                    mineCount+=1 
+            #if blank, reveal surrounding        
+            if mineCount != 0:
+                board[i][j] = str(mineCount)
+            else:
+                board[i][j] = "B"
+                for a, b in directions:
+                    if 0<=i+a<row and 0<=j+b<col and board[i+a][j+b] == "E":
+                        que.append((i+a,j+b))
+                        board[i+a][j+b] = "B"
+                
         
-    def bfs(self, check, row, col, grid):
-        queue = deque([(row, col)])
-        while queue:
-            row, col = queue.popleft()
-            if 0 <= row < len(grid) and 0 <= col < len(grid[0]) and grid[row][col] == "1" and check[row][col] == False:
-                check[row][col] = True
-                queue.append([(row + 1, col), (row, col + 1), (row - 1, col), (row, col - 1)])
+        return board
 ```
 
 **130. Surrounded Regions**
@@ -4648,13 +5464,448 @@ class Solution(object):
             self.bfs(board, i, j-1)
 ```
 
+\863. All Nodes Distance K in Binary Tree
 
+Medium
 
+6826132Add to ListShare
 
+Given the `root` of a binary tree, the value of a target node `target`, and an integer `k`, return *an array of the values of all nodes that have a distance* `k` *from the target node.*
 
+You can return the answer in **any order**.
 
+ 
 
+**Example 1:**
 
+![img](https://s3-lc-upload.s3.amazonaws.com/uploads/2018/06/28/sketch0.png)
+
+```
+Input: root = [3,5,1,6,2,0,8,null,null,7,4], target = 5, k = 2
+Output: [7,4,1]
+Explanation: The nodes that are a distance 2 from the target node (with value 5) have values 7, 4, and 1.
+```
+
+```py
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution(object):
+    def distanceK(self, root, target, k):
+        """
+        :type root: TreeNode
+        :type target: TreeNode
+        :type k: int
+        :rtype: List[int]
+        """
+        """
+        Use a DFS to build the map, keys are node.val and values are connexted nodes
+        Then use a BFS to find the k far nodes
+        """
+        res = []
+        mapping = self.dfs(root, collections.defaultdict(list), None)
+        #bfs to find the 
+        print mapping
+        que = collections.deque()
+        que.append((target.val, 0))
+        visited = set()
+        visited.add(target.val)
+        while que:
+            cur, level = que.popleft()
+            if level == k:
+                res.append(cur)
+            else:
+                for neibor in mapping[cur]:
+                    if neibor not in visited:
+                        que.append((neibor,level+1))
+                        visited.add(neibor)
+        return res
+        
+    def dfs(self,root, mapping, parent):
+        if not root:
+            return
+        #add parent and child node into mapping
+        if parent != None:
+            mapping[root.val].append(parent)
+        if root.left:
+            mapping[root.val].append(root.left.val)
+            self.dfs(root.left, mapping, root.val)
+        if root.right:
+            mapping[root.val].append(root.right.val)
+            self.dfs(root.right, mapping, root.val)
+        return mapping
+```
+
+\286. Walls and Gates
+
+Medium
+
+251342Add to ListShare
+
+You are given an `m x n` grid `rooms` initialized with these three possible values.
+
+- `-1` A wall or an obstacle.
+- `0` A gate.
+- `INF` Infinity means an empty room. We use the value `231 - 1 = 2147483647` to represent `INF` as you may assume that the distance to a gate is less than `2147483647`.
+
+Fill each empty room with the distance to *its nearest gate*. If it is impossible to reach a gate, it should be filled with `INF`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/01/03/grid.jpg)
+
+```
+Input: rooms = [[2147483647,-1,0,2147483647],[2147483647,2147483647,2147483647,-1],[2147483647,-1,2147483647,-1],[0,-1,2147483647,2147483647]]
+Output: [[3,-1,0,1],[2,2,1,-1],[1,-1,2,-1],[0,-1,3,4]]
+```
+
+```py
+class Solution(object):
+    def wallsAndGates(self, rooms):
+        """
+        BFS
+        """
+        que = collections.deque()
+        row, col = len(rooms), len(rooms[0])
+        directions = [(0,1),(1,0),(0,-1),(-1,0)]
+        #First put all gate into queue with distance 0
+        for i in range(row):
+            for j in range(col):
+                if rooms[i][j] == 0:
+                    que.append((i,j,0))
+        
+        #use BFS to mark each empty room with steps
+        while que:
+            #get current step
+            x,y, steps = que.popleft()
+            #do bfs on neibors
+            for a,b in directions:
+                if 0<=x+a<row and 0<=y+b<col and rooms[x+a][y+b] == 2147483647:
+                    #mark steps on neibor
+                    rooms[x+a][y+b] = steps+1
+                    que.append((x+a,y+b,steps+1))
+        return rooms
+            
+```
+
+\934. Shortest Bridge
+
+Medium
+
+2933136Add to ListShare
+
+You are given an `n x n` binary matrix `grid` where `1` represents land and `0` represents water.
+
+An **island** is a 4-directionally connected group of `1`'s not connected to any other `1`'s. There are **exactly two islands** in `grid`.
+
+You may change `0`'s to `1`'s to connect the two islands to form **one island**.
+
+Return *the smallest number of* `0`*'s you must flip to connect the two islands*.
+
+ 
+
+**Example 1:**
+
+```
+Input: grid = [[0,1],[1,0]]
+Output: 1
+```
+
+```py
+class Solution(object):
+    def shortestBridge(self, grid):
+        """
+        :type grid: List[List[int]]
+        :rtype: int
+        """
+        """
+        BFS
+        """
+        #first identify one islands using bfs
+            #use visited set to record visited node 
+        row,col = len(grid), len(grid[0])
+        visited = set()
+        que = collections.deque()
+        directions = [(0,1),(1,0),(0,-1),(-1,0)]
+        #for later BFS
+        que2 = collections.deque()
+        #first island found
+        stop = False
+        for i in range(row):
+            if stop:
+                break
+            for j in range(col):
+                if grid[i][j] == 1:
+                    que.append((i,j))
+                    visited.add((i,j))
+                    stop = True
+                    break
+                    
+            
+        #find all first island
+        while que:
+            x,y = que.popleft()
+            que2.append((x,y,0))
+            for a,b in directions:
+                if 0<=x+a<row and 0<=y+b<col and grid[x+a][y+b] == 1 and (x+a,y+b) not in visited:
+                    que.append((x+a,y+b))
+                    visited.add((x+a,y+b))
+        
+        #Do BFS on each island node, when find a node belongs to other island, return steps
+        while que2:
+            i,j,steps = que2.popleft()
+            for a,b in directions:
+                if 0<=i+a<row and 0<=j+b<col and (i+a,j+b) not in visited:
+                    if grid[i+a][j+b] == 1:
+                        return steps
+                    que2.append((i+a,j+b,steps+1))
+                    visited.add((i+a,j+b))
+        
+        return -1
+```
+
+\694. Number of Distinct Islands
+
+Medium
+
+1867110Add to ListShare
+
+You are given an `m x n` binary matrix `grid`. An island is a group of `1`'s (representing land) connected **4-directionally** (horizontal or vertical.) You may assume all four edges of the grid are surrounded by water.
+
+An island is considered to be the same as another if and only if one island can be translated (and not rotated or reflected) to equal the other.
+
+Return *the number of **distinct** islands*.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2021/05/01/distinctisland1-1-grid.jpg)
+
+```
+Input: grid = [[1,1,0,0,0],[1,1,0,0,0],[0,0,0,1,1],[0,0,0,1,1]]
+Output: 1
+```
+
+```py
+class Solution(object):
+    def numDistinctIslands(self, grid):
+        """
+        :type grid: List[List[int]]
+        :rtype: int
+        """
+        """
+        BFS OR DFS
+        """
+        #BFS solutions:
+        que = collections.deque()
+        row, col = len(grid), len(grid[0])
+        directions = [(0,1,"R"),(1,0,"U"),(-1,0,"D"),(0,-1,"L")]
+        visited = set()
+        islands = set()
+        for i in range(row):
+            for j in range(col):
+                if grid[i][j] == 1:
+                    que.append((i,j))
+                    visited.add((i,j))
+                    finalRes = ""
+                    while que:
+                        x,y = que.popleft()
+                        grid[x][y] = 0
+                        for a,b,dire in directions:
+                            if 0<=x+a<row and 0<=y+b<col and (x+a,y+b) not in visited and grid[x+a][y+b] == 1:
+                                finalRes += dire
+                                que.append((x+a,y+b))
+                                visited.add((x+a,y+b))
+                        ###
+                        #Important part
+                        ####
+                        finalRes += "0"
+                        ###
+                        
+                        ###
+            
+                    islands.add(finalRes)
+                finalRes = ""
+        return len(islands)
+```
+
+\787. Cheapest Flights Within K Stops
+
+Medium
+
+5462250Add to ListShare
+
+There are `n` cities connected by some number of flights. You are given an array `flights` where `flights[i] = [fromi, toi, pricei]` indicates that there is a flight from city `fromi` to city `toi` with cost `pricei`.
+
+You are also given three integers `src`, `dst`, and `k`, return ***the cheapest price** from* `src` *to* `dst` *with at most* `k` *stops.* If there is no such route, return `-1`.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2022/03/18/cheapest-flights-within-k-stops-3drawio.png)
+
+```
+Input: n = 4, flights = [[0,1,100],[1,2,100],[2,0,100],[1,3,600],[2,3,200]], src = 0, dst = 3, k = 1
+Output: 700
+Explanation:
+The graph is shown above.
+The optimal path with at most 1 stop from city 0 to 3 is marked in red and has cost 100 + 600 = 700.
+Note that the path through cities [0,1,2,3] is cheaper but is invalid because it uses 2 stops.
+```
+
+```py
+class Solution(object):
+    def findCheapestPrice(self, n, flights, src, dst, k):
+        """
+        :type n: int
+        :type flights: List[List[int]]
+        :type src: int
+        :type dst: int
+        :type k: int
+        :rtype: int
+        """
+        """
+        BFS
+        """
+#         if not flights:
+#             return -1
+#         #create a map mapping each city to its dest
+#         mapping = collections.defaultdict(list)
+#         for i,j,money in flights:
+#             mapping[i].append((j,money))
+        
+#         #from src do bfs, put in steps and money in tuple 
+#             #if reach des and steps < k add into res 
+#         que = collections.deque()
+#         res = sys.maxint
+#         que.append((src,0,0))
+#         while que:
+#             start, steps, cost = que.popleft()
+#             if cost <= res and steps <= k and start != dst:
+#                 for neibor, money in mapping[start]:
+#                     que.append((neibor,steps+1,cost+money))
+#             if start == dst:
+#                 res = min(res,cost)
+#         if res != sys.maxint:
+#             return res
+#         return -1
+        # Build the adjacency matrix
+        adj_matrix = [[0 for _ in range(n)] for _ in range(n)]
+        for s, d, w in flights:
+            adj_matrix[s][d] = w
+            
+        # Shortest distances dictionary
+        distances = {}
+        distances[(src, 0)] = 0
+        
+        # BFS Queue
+        bfsQ = deque([src])
+        
+        # Number of stops remaining
+        stops = 0
+        ans = float("inf")
+        
+        # Iterate until we exhaust K+1 levels or the queue gets empty
+        while bfsQ and stops < k + 1:
+            
+            # Iterate on current level
+            length = len(bfsQ)
+            for _ in range(length):
+                node = bfsQ.popleft()
+                
+                # Loop over neighbors of popped node
+                for nei in range(n):
+                    if adj_matrix[node][nei] > 0:
+                        dU = distances.get((node, stops), float("inf"))
+                        dV = distances.get((nei, stops + 1), float("inf"))
+                        wUV = adj_matrix[node][nei]
+                        
+                        # No need to update the minimum cost if we have already exhausted our K stops. 
+                        if stops == k and nei != dst:
+                            continue
+                        
+                        if dU + wUV < dV:
+                            distances[nei, stops + 1] = dU + wUV
+                            bfsQ.append(nei)
+                            
+                            # Shortest distance of the destination from the source
+                            if nei == dst:
+                                ans = min(ans, dU + wUV)
+            stops += 1   
+        
+        return -1 if ans == float("inf") else ans
+```
+
+\785. Is Graph Bipartite?
+
+Medium
+
+5223284Add to ListShare
+
+There is an **undirected** graph with `n` nodes, where each node is numbered between `0` and `n - 1`. You are given a 2D array `graph`, where `graph[u]` is an array of nodes that node `u` is adjacent to. More formally, for each `v` in `graph[u]`, there is an undirected edge between node `u` and node `v`. The graph has the following properties:
+
+- There are no self-edges (`graph[u]` does not contain `u`).
+- There are no parallel edges (`graph[u]` does not contain duplicate values).
+- If `v` is in `graph[u]`, then `u` is in `graph[v]` (the graph is undirected).
+- The graph may not be connected, meaning there may be two nodes `u` and `v` such that there is no path between them.
+
+A graph is **bipartite** if the nodes can be partitioned into two independent sets `A` and `B` such that **every** edge in the graph connects a node in set `A` and a node in set `B`.
+
+Return `true` *if and only if it is **bipartite***.
+
+ 
+
+**Example 1:**
+
+![img](https://assets.leetcode.com/uploads/2020/10/21/bi2.jpg)
+
+```
+Input: graph = [[1,2,3],[0,2],[0,1,3],[0,2]]
+Output: false
+Explanation: There is no way to partition the nodes into two independent sets such that every edge connects a node in one and a node in the other.
+```
+
+```py
+class Solution(object):
+    def isBipartite(self, graph):
+        """
+        :type graph: List[List[int]]
+        :rtype: bool
+        """
+        """
+        BFS each node, setting color of each node's neibors opposite of each node
+        if see node with 
+        """
+        #colored to store color of node 
+        colored = {}
+        for i in range(len(graph)):
+            
+            #if not visited, mark color == 1 and put in BFS
+            if i not in colored and graph[i]:
+                colored[i] = 1
+                que = collections.deque([i])
+                
+                #for each BFS check each neibor color and color in opposite color
+                while que:
+                    cur = que.popleft()
+                    for j in graph[cur]:
+                        if j not in colored:
+                            colored[j] = -colored[cur]
+                            que.append(j)
+                        else:
+                            #if same color for neibor, return false
+                            if colored[cur] == colored[j]:
+                                return False
+        return True
+```
 
 
 

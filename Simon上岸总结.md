@@ -2558,7 +2558,7 @@ Explanation: There is no 132 pattern in the sequence.
 #Difference between heappush and heapify:
     1. The heappush method will have time complexity O(n * log(n)) where n is ending size of the heap, while the heapify method will have complexity O(n), which is significantly lower. 
     2. heappush assumes that the array (H in your case) is already a heap. heapify does not
-    3. doing heapifyon a list is almost always a better choice than creating an empty list and adding many items with heappush. If you just add a few items, heappush may be better.
+    3. doing heapify on a list is almost always a better choice than creating an empty list and adding many items with heappush. If you just add a few items, heappush may be better.
 
 #common functions 
 heapq.heapify() #build
